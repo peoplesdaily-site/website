@@ -449,7 +449,6 @@
       grid-template-rows: auto auto;
       gap: 2px;
     }
-    /* FEATURED STORY */
     .hero-featured {
       grid-row: 1 / 3;
       position: relative;
@@ -491,7 +490,6 @@
     }
     .hero-meta strong { color: rgba(255,255,255,0.9); }
 
-    /* SECONDARY HERO STORIES */
     .hero-secondary {
       display: flex;
       flex-direction: column;
@@ -522,13 +520,6 @@
       margin-top: 6px;
     }
 
-    /* ============================================
-       BREAKING NEWS TICKER BANNER
-    ============================================ */
-
-    /* ============================================
-       MAIN CONTENT + SIDEBAR LAYOUT
-    ============================================ */
     .content-area {
       padding: 24px 0 36px;
     }
@@ -538,7 +529,6 @@
       gap: 36px;
     }
 
-    /* ============ NEWS GRID ============ */
     .news-section { margin-bottom: 40px; }
 
     .news-grid-3 {
@@ -605,7 +595,6 @@
     }
     .news-card-meta .author { font-weight: 600; color: var(--text-secondary); }
 
-    /* LARGE FEATURE CARD */
     .news-card-large {
       border-radius: var(--radius);
       overflow: hidden;
@@ -619,7 +608,6 @@
       font-size: 20px;
     }
 
-    /* LIST STYLE CARD */
     .news-list-item {
       display: grid;
       grid-template-columns: 90px 1fr;
@@ -646,9 +634,6 @@
       color: var(--text-muted);
     }
 
-    /* ============================================================
-       OPINION / EDITORIAL STRIP
-    ============================================================ */
     .opinion-section {
       background: var(--bg-soft);
       border-top: 3px solid #1e3a5c;
@@ -702,9 +687,6 @@
       font-family: var(--font-ui);
     }
 
-    /* ============================================================
-       MID-PAGE AD BANNER
-    ============================================================ */
     .ad-mid {
       margin: 0 0 36px;
       background: var(--bg-soft);
@@ -731,9 +713,6 @@
       font-size: 13px;
       color: var(--text-muted);
     }
-
-    /* ============ SIDEBAR ============ */
-    .sidebar { }
 
     .sidebar-widget {
       margin-bottom: 30px;
@@ -798,7 +777,6 @@
       margin-top: 3px;
     }
 
-    /* Trending tags */
     .trend-tags {
       padding: 12px;
       display: flex;
@@ -818,7 +796,6 @@
     }
     .trend-tag:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-    /* Newsletter box */
     .newsletter-box {
       background: linear-gradient(135deg, #1e3a5c 0%, #14294a 100%);
       border-radius: var(--radius);
@@ -865,7 +842,6 @@
     }
     .newsletter-btn:hover { background: var(--accent-light); }
 
-    /* Sidebar Ad */
     .sidebar-ad {
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -886,9 +862,6 @@
       border-top: 1px solid var(--border);
     }
 
-    /* ============================================================
-       SPORTS STRIP
-    ============================================================ */
     .sports-strip {
       background: #1e3a5c;
       padding: 24px 0;
@@ -927,9 +900,6 @@
       color: rgba(255,255,255,0.5);
     }
 
-    /* ============================================================
-       FOOTER
-    ============================================================ */
     .footer-top {
       background: #0d2240;
       padding: 48px 0 36px;
@@ -968,6 +938,17 @@
       color: rgba(255,255,255,0.5);
       line-height: 1.65;
       margin-bottom: 20px;
+    }
+    .footer-col h5 {
+      font-family: var(--font-ui);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #ffffff;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
     .footer-col ul li {
       margin-bottom: 9px;
@@ -1008,9 +989,6 @@
     }
     .footer-links a:hover { color: rgba(255,255,255,0.7); }
 
-    /* ============================================================
-       MOBILE MENU OVERLAY
-    ============================================================ */
     .mobile-menu {
       display: none;
       position: fixed;
@@ -1053,9 +1031,6 @@
     .mobile-nav-list li a:hover { background: rgba(255,255,255,0.07); color: #fff; }
     .mobile-nav-list .nav-dashboard a { color: var(--gold); }
 
-    /* ============================================================
-       SEARCH OVERLAY
-    ============================================================ */
     .search-overlay {
       display: none;
       position: fixed;
@@ -1095,9 +1070,6 @@
       cursor: pointer;
     }
 
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
     @media (max-width: 1100px) {
       .content-layout { grid-template-columns: 1fr 260px; gap: 24px; }
       .news-grid-3 { grid-template-columns: 1fr 1fr; }
@@ -1124,13 +1096,17 @@
       .opinion-grid { grid-template-columns: 1fr; }
       .hero-secondary { flex-direction: column; }
       .footer-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .masthead-inner { grid-template-columns: 1fr auto; }
+      .logo-tagline { display: none; }
+      .logo-name { font-size: 24px; }
+      .sports-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
-<!-- ========================================================
-     TOP BAR
-======================================================== -->
 <div class="top-bar">
   <div class="container">
     <div class="top-bar-inner">
@@ -1138,7 +1114,6 @@
         <span id="current-date">Sunday, April 5, 2026</span>
       </div>
       <div class="top-bar-social">
-        <!-- Facebook -->
         <a href="#" aria-label="Facebook">
           <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
         </a>
@@ -1147,18 +1122,13 @@
   </div>
 </div>
 
-<!-- ========================================================
-     MASTHEAD / HEADER
-======================================================== -->
 <header class="masthead">
   <div class="container">
     <div class="masthead-inner">
-      <!-- LOGO -->
       <a href="#" class="logo-wrap">
         <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="logo-img">
       </a>
 
-      <!-- CENTER AD SLOT -->
       <div class="masthead-ad-slot">
         <div>
           <div class="ad-label">Advertisement</div>
@@ -1166,7 +1136,6 @@
         </div>
       </div>
 
-      <!-- ACTIONS -->
       <div class="masthead-actions">
         <button class="search-btn" onclick="toggleSearch()" aria-label="Search">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1178,9 +1147,6 @@
   </div>
 </header>
 
-<!-- ========================================================
-     NAVIGATION BAR
-======================================================== -->
 <nav class="navbar">
   <div class="container">
     <div class="navbar-inner">
@@ -1204,9 +1170,6 @@
   </div>
 </nav>
 
-<!-- ========================================================
-     AD BANNER (Top — below nav)
-======================================================== -->
 <div class="ad-banner-top">
   <div class="container">
     <div class="ad-label">Advertisement</div>
@@ -1220,14 +1183,9 @@
   </div>
 </div>
 
-<!-- ========================================================
-     HERO SECTION
-======================================================== -->
 <section class="hero">
   <div class="container">
     <div class="hero-grid">
-
-      <!-- MAIN FEATURED STORY -->
       <div class="hero-featured">
         <div class="img-placeholder" style="height:480px">
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1256,7 +1214,6 @@
         </div>
       </div>
 
-      <!-- SECONDARY STORIES COLUMN -->
       <div class="hero-secondary">
         <div class="hero-sec-card">
           <div class="img-placeholder" style="min-height:180px">
@@ -1287,25 +1244,17 @@
         </div>
       </div>
 
-    </div><!-- /hero-grid -->
+    </div>
   </div>
 </section>
 
-<!-- ========================================================
-     MAIN CONTENT + SIDEBAR
-======================================================== -->
 <div class="content-area">
   <div class="container">
     <div class="content-layout">
-
-      <!-- ================ MAIN COLUMN ================ -->
       <main>
-
-        <!-- LOCAL NEWS -->
         <section class="news-section">
           <div class="section-label accent">Local News</div>
           <div class="news-grid-3">
-
             <article class="news-card">
               <div class="img-placeholder" style="height:180px">
                 <svg viewBox="0 0 48 48" fill="none"><rect x="6" y="10" width="36" height="28" rx="2" stroke="#bbb" stroke-width="2"/><circle cx="18" cy="20" r="4" stroke="#bbb" stroke-width="2"/><path d="M6 32l8-8 6 6 8-10 14 14" stroke="#bbb" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -1350,15 +1299,12 @@
                 </div>
               </div>
             </article>
-
           </div>
         </section>
 
-        <!-- POLITICS -->
         <section class="news-section">
           <div class="section-label accent">Politics</div>
           <div class="news-grid-featured">
-
             <article class="news-card news-card-large">
               <div class="img-placeholder" style="height:260px">
                 <svg viewBox="0 0 48 48" fill="none"><rect x="6" y="10" width="36" height="28" rx="2" stroke="#bbb" stroke-width="2"/><circle cx="18" cy="20" r="4" stroke="#bbb" stroke-width="2"/><path d="M6 32l8-8 6 6 8-10 14 14" stroke="#bbb" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -1408,26 +1354,22 @@
                 </div>
               </div>
             </div>
-
           </div>
         </section>
 
-        <!-- MID-PAGE AD BANNER -->
         <div class="ad-mid">
           <div class="ad-label">Advertisement — Advertise With Us</div>
           <img src="images/thumbnail (1500 x 500 px).png" alt="Advertisement Banner"
-               onerror="this.outerHTML='<div style=\'background:linear-gradient(135deg,#1a1a2e,#2c2c4e);border-radius:4px;padding:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;\'><div><p style=\'font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;\'>Reach 50,000+ Daily Readers</p><p style=\'font-family:var(--font-ui);font-size:13px;color:rgba(255,255,255,0.6);\'>Premium advertising placements available for your brand.</p></div><a href=\"#\" class=\"btn btn-primary\">Advertise With Us →</a></div>'">
+               onerror="this.outerHTML='<div style=\'background:linear-gradient(135deg,#1a1a2e,#2c2c4e);border-radius:4px;padding:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;\'><div><p style=\'font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;\'>Reach 50,000+ Daily Readers</p><p style=\'font-family:var(--font-ui);font-size:13px;color:rgba(255,255,255,0.6);\'>Premium advertising placements available for your brand.</p></div><a href="#" class="btn btn-primary">Advertise With Us →</a></div>'">
           <div class="ad-mid-cta">
             <p>Premium placements available · <strong>Contact our advertising team today</strong></p>
             <a href="#" class="ad-cta">Get In Touch</a>
           </div>
         </div>
 
-        <!-- BUSINESS & ECONOMY -->
         <section class="news-section">
           <div class="section-label accent">Business & Economy</div>
           <div class="news-grid-2">
-
             <article class="news-card">
               <div class="img-placeholder" style="height:200px"></div>
               <div class="news-card-body">
@@ -1453,95 +1395,38 @@
                 </div>
               </div>
             </article>
-
           </div>
         </section>
-
       </main>
 
-      <!-- ================ SIDEBAR ================ -->
       <aside class="sidebar">
-
-        <!-- MOST READ -->
         <div class="sidebar-widget">
           <div class="sidebar-widget-title">
             <svg viewBox="0 0 16 16"><path d="M8 1l1.5 3 3.5.5-2.5 2.5.5 3.5L8 9l-3 1.5.5-3.5L3 4.5 6.5 4z"/></svg>
             Most Read
           </div>
           <div class="sidebar-widget-body">
-            <div class="sidebar-list-item">
-              <span class="sidebar-num">01</span>
-              <div>
-                <div class="sidebar-list-title">Parliament Passes Anti-Corruption Bill in Historic Vote</div>
-                <div class="sidebar-mini-meta">3.4k reads · Politics</div>
-              </div>
-            </div>
-            <div class="sidebar-list-item">
-              <span class="sidebar-num">02</span>
-              <div>
-                <div class="sidebar-list-title">Minister Resigns Amid Procurement Inquiry</div>
-                <div class="sidebar-mini-meta">2.8k reads · Politics</div>
-              </div>
-            </div>
-            <div class="sidebar-list-item">
-              <span class="sidebar-num">03</span>
-              <div>
-                <div class="sidebar-list-title">Debswana Reports Record Production Quarter</div>
-                <div class="sidebar-mini-meta">2.1k reads · Business</div>
-              </div>
-            </div>
-            <div class="sidebar-list-item">
-              <span class="sidebar-num">04</span>
-              <div>
-                <div class="sidebar-list-title">Robbery Suspects Arrested Within 24 Hours</div>
-                <div class="sidebar-mini-meta">1.9k reads · Crime</div>
-              </div>
-            </div>
-            <div class="sidebar-list-item">
-              <span class="sidebar-num">05</span>
-              <div>
-                <div class="sidebar-list-title">SADC Leaders Hold Climate Summit in Gaborone</div>
-                <div class="sidebar-mini-meta">1.5k reads · World</div>
-              </div>
-            </div>
+            <div class="sidebar-list-item"><span class="sidebar-num">01</span><div><div class="sidebar-list-title">Parliament Passes Anti-Corruption Bill in Historic Vote</div><div class="sidebar-mini-meta">3.4k reads · Politics</div></div></div>
+            <div class="sidebar-list-item"><span class="sidebar-num">02</span><div><div class="sidebar-list-title">Minister Resigns Amid Procurement Inquiry</div><div class="sidebar-mini-meta">2.8k reads · Politics</div></div></div>
+            <div class="sidebar-list-item"><span class="sidebar-num">03</span><div><div class="sidebar-list-title">Debswana Reports Record Production Quarter</div><div class="sidebar-mini-meta">2.1k reads · Business</div></div></div>
+            <div class="sidebar-list-item"><span class="sidebar-num">04</span><div><div class="sidebar-list-title">Robbery Suspects Arrested Within 24 Hours</div><div class="sidebar-mini-meta">1.9k reads · Crime</div></div></div>
+            <div class="sidebar-list-item"><span class="sidebar-num">05</span><div><div class="sidebar-list-title">SADC Leaders Hold Climate Summit in Gaborone</div><div class="sidebar-mini-meta">1.5k reads · World</div></div></div>
           </div>
         </div>
 
-        <!-- LATEST -->
         <div class="sidebar-widget">
           <div class="sidebar-widget-title">
             <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
             Latest Updates
           </div>
           <div class="sidebar-widget-body">
-            <div class="sidebar-list-item">
-              <div>
-                <div class="sidebar-mini-meta" style="color:var(--accent);font-weight:700;margin-bottom:3px">Just now</div>
-                <div class="sidebar-list-title">Traffic disruptions reported on A1 highway near Mochudi turnoff</div>
-              </div>
-            </div>
-            <div class="sidebar-list-item">
-              <div>
-                <div class="sidebar-mini-meta" style="margin-bottom:3px">30 min ago</div>
-                <div class="sidebar-list-title">UB students protest over accommodation fee increases</div>
-              </div>
-            </div>
-            <div class="sidebar-list-item">
-              <div>
-                <div class="sidebar-mini-meta" style="margin-bottom:3px">1 hour ago</div>
-                <div class="sidebar-list-title">Power outages expected in parts of Gaborone today — BPC statement</div>
-              </div>
-            </div>
-            <div class="sidebar-list-item">
-              <div>
-                <div class="sidebar-mini-meta" style="margin-bottom:3px">2 hours ago</div>
-                <div class="sidebar-list-title">Khama speaks at regional youth leadership summit in Maun</div>
-              </div>
-            </div>
+            <div class="sidebar-list-item"><div><div class="sidebar-mini-meta" style="color:var(--accent);font-weight:700;margin-bottom:3px">Just now</div><div class="sidebar-list-title">Traffic disruptions reported on A1 highway near Mochudi turnoff</div></div></div>
+            <div class="sidebar-list-item"><div><div class="sidebar-mini-meta" style="margin-bottom:3px">30 min ago</div><div class="sidebar-list-title">UB students protest over accommodation fee increases</div></div></div>
+            <div class="sidebar-list-item"><div><div class="sidebar-mini-meta" style="margin-bottom:3px">1 hour ago</div><div class="sidebar-list-title">Power outages expected in parts of Gaborone today — BPC statement</div></div></div>
+            <div class="sidebar-list-item"><div><div class="sidebar-mini-meta" style="margin-bottom:3px">2 hours ago</div><div class="sidebar-list-title">Khama speaks at regional youth leadership summit in Maun</div></div></div>
           </div>
         </div>
 
-        <!-- NEWSLETTER -->
         <div class="newsletter-box">
           <h4>Stay Informed Daily</h4>
           <p>Get the top stories delivered to your inbox every morning. Free, no spam.</p>
@@ -1549,7 +1434,6 @@
           <button class="newsletter-btn">Subscribe Free</button>
         </div>
 
-        <!-- TRENDING TOPICS -->
         <div class="sidebar-widget">
           <div class="sidebar-widget-title">
             <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 12l4-4 3 3 5-7"/></svg>
@@ -1571,61 +1455,47 @@
           </div>
         </div>
 
-        <!-- SIDEBAR AD -->
         <div class="sidebar-ad">
           <div class="img-placeholder" style="height:250px">
             <svg viewBox="0 0 48 48" fill="none" width="40" height="40"><rect x="4" y="4" width="40" height="40" rx="4" stroke="#bbb" stroke-width="2"/><path d="M14 28l6-8 5 6 4-5 5 7" stroke="#bbb" stroke-width="2" stroke-linejoin="round"/></svg>
           </div>
           <div class="sidebar-ad-label">Advertisement · Advertise Here</div>
         </div>
-
       </aside>
-
-    </div><!-- /content-layout -->
+    </div>
   </div>
 </div>
 
-<!-- ========================================================
-     OPINION / EDITORIAL SECTION
-======================================================== -->
 <section class="opinion-section">
   <div class="container">
     <div class="section-label accent">Opinion &amp; Analysis</div>
     <div class="opinion-grid">
-
       <div class="opinion-card">
         <div class="opinion-avatar"></div>
         <div class="opinion-author">Kefilwe Mogami — Senior Correspondent</div>
         <div class="opinion-title">"The Anti-Corruption Bill Is a Milestone, But Enforcement Will Be Everything"</div>
         <p class="opinion-excerpt">Passing legislation is the first step. The real test lies in the political will to act on it regardless of who is implicated.</p>
       </div>
-
       <div class="opinion-card">
         <div class="opinion-avatar"></div>
         <div class="opinion-author">Dr. Tebogo Nkosi — Economics Analyst</div>
         <div class="opinion-title">"Diversifying Beyond Diamonds Is Botswana's Greatest Economic Imperative"</div>
         <p class="opinion-excerpt">Record production numbers are welcome news, but they should not distract policymakers from the urgent need to reduce resource dependency.</p>
       </div>
-
       <div class="opinion-card">
         <div class="opinion-avatar"></div>
         <div class="opinion-author">Lesedi Phiri — Political Editor</div>
         <div class="opinion-title">"The Resignation Is Just the Beginning — Parliament Must Now Go Further"</div>
         <p class="opinion-excerpt">One minister's exit does not heal systemic issues in public procurement. Accountability requires a deeper structural response.</p>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ========================================================
-     SPORTS STRIP
-======================================================== -->
 <section class="sports-strip">
   <div class="container">
     <div class="section-label accent" style="color:rgba(255,255,255,0.5)">Sports</div>
     <div class="sports-grid">
-
       <div class="sports-card">
         <div class="img-placeholder" style="height:130px;background:linear-gradient(135deg,#1a2e1a,#2a3e2a)"></div>
         <div class="sports-card-body">
@@ -1634,7 +1504,6 @@
           <div class="sports-card-meta">Kick-off: 7:00 PM · Match preview →</div>
         </div>
       </div>
-
       <div class="sports-card">
         <div class="img-placeholder" style="height:130px;background:linear-gradient(135deg,#1a1a2e,#2c2c4e)"></div>
         <div class="sports-card-body">
@@ -1643,7 +1512,6 @@
           <div class="sports-card-meta">3 gold medals · Full results →</div>
         </div>
       </div>
-
       <div class="sports-card">
         <div class="img-placeholder" style="height:130px;background:linear-gradient(135deg,#2e1a1a,#4e2c2c)"></div>
         <div class="sports-card-body">
@@ -1652,7 +1520,6 @@
           <div class="sports-card-meta">Final score: 84–82 · Highlights →</div>
         </div>
       </div>
-
       <div class="sports-card">
         <div class="img-placeholder" style="height:130px;background:linear-gradient(135deg,#1a2e2e,#2c4e4e)"></div>
         <div class="sports-card-body">
@@ -1661,19 +1528,14 @@
           <div class="sports-card-meta">April 12–18 · Tournament guide →</div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ========================================================
-     ENTERTAINMENT ROW
-======================================================== -->
 <div class="content-area" style="padding-top:4px">
   <div class="container">
     <div class="section-label accent">Entertainment &amp; Culture</div>
     <div class="news-grid-3" style="margin-bottom:40px">
-
       <article class="news-card">
         <div class="img-placeholder" style="height:170px;background:linear-gradient(135deg,#2e1a2e,#4e2c4e)"></div>
         <div class="news-card-body">
@@ -1686,7 +1548,6 @@
           </div>
         </div>
       </article>
-
       <article class="news-card">
         <div class="img-placeholder" style="height:170px;background:linear-gradient(135deg,#1a2e2a,#2c4e3e)"></div>
         <div class="news-card-body">
@@ -1699,7 +1560,6 @@
           </div>
         </div>
       </article>
-
       <article class="news-card">
         <div class="img-placeholder" style="height:170px;background:linear-gradient(135deg,#2e2a1a,#4e3e2c)"></div>
         <div class="news-card-body">
@@ -1712,30 +1572,18 @@
           </div>
         </div>
       </article>
-
     </div>
   </div>
 </div>
 
-<!-- ========================================================
-     FOOTER
-======================================================== -->
 <footer>
   <div class="footer-top">
     <div class="container">
       <div class="footer-grid">
-
-        <!-- BRAND -->
         <div class="footer-brand">
           <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="footer-logo-img">
-          <div class="footer-social" style="margin-top:16px">
-            <a href="#" class="social-icon" aria-label="Facebook">
-              <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-            </a>
-          </div>
         </div>
 
-        <!-- SECTIONS -->
         <div class="footer-col">
           <h5>Sections</h5>
           <ul>
@@ -1751,7 +1599,6 @@
           </ul>
         </div>
 
-        <!-- COMPANY -->
         <div class="footer-col">
           <h5>Company</h5>
           <ul>
@@ -1765,7 +1612,6 @@
           </ul>
         </div>
 
-        <!-- SUBSCRIBE -->
         <div class="footer-col">
           <h5>Subscribe</h5>
           <ul>
@@ -1782,7 +1628,6 @@
             </p>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -1803,14 +1648,11 @@
   </div>
 </footer>
 
-<!-- ========================================================
-     MOBILE MENU OVERLAY
-======================================================== -->
 <div class="mobile-menu" id="mobileMenu">
-    <div class="mobile-menu-header">
-      <img src="images/thumbnail (6).png" alt="People's Daily News Online" style="height:36px;width:auto;object-fit:contain">
-      <button class="close-btn" onclick="toggleMenu()">✕</button>
-    </div>
+  <div class="mobile-menu-header">
+    <img src="images/thumbnail (6).png" alt="People's Daily News Online" style="height:36px;width:auto;object-fit:contain">
+    <button class="close-btn" onclick="toggleMenu()">✕</button>
+  </div>
   <ul class="mobile-nav-list">
     <li><a href="#">Home</a></li>
     <li><a href="#">Politics</a></li>
@@ -1830,9 +1672,6 @@
   </ul>
 </div>
 
-<!-- ========================================================
-     SEARCH OVERLAY
-======================================================== -->
 <div class="search-overlay" id="searchOverlay">
   <button class="search-close" onclick="toggleSearch()">✕</button>
   <div class="search-box">
@@ -1842,11 +1681,7 @@
   </div>
 </div>
 
-<!-- ========================================================
-     MINIMAL JS (layout/UI only)
-======================================================== -->
 <script>
-  // Current date in top bar
   (function() {
     var d = new Date();
     var opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -1854,14 +1689,12 @@
     if (el) el.textContent = d.toLocaleDateString('en-US', opts);
   })();
 
-  // Mobile menu toggle
   function toggleMenu() {
     var m = document.getElementById('mobileMenu');
     m.classList.toggle('open');
     document.body.style.overflow = m.classList.contains('open') ? 'hidden' : '';
   }
 
-  // Search overlay toggle
   function toggleSearch() {
     var s = document.getElementById('searchOverlay');
     s.classList.toggle('open');
@@ -1873,7 +1706,6 @@
     }
   }
 
-  // ESC key to close overlays
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       document.getElementById('searchOverlay').classList.remove('open');
@@ -1882,7 +1714,6 @@
     }
   });
 
-  // Sticky nav active state on scroll (visual only)
   window.addEventListener('scroll', function() {
     var nav = document.querySelector('.navbar');
     if (window.scrollY > 10) {
@@ -1895,3 +1726,4 @@
 
 </body>
 </html>
+
