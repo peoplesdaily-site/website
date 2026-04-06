@@ -35,6 +35,7 @@ let currentUser  = null; // signed-in Supabase user object
 // INITIALISATION — runs on page load
 // ══════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  document.body.style.visibility = 'visible';
   document.body.classList.add('auth-ready');
   document.body.classList.remove('auth-pending');
 });
@@ -95,6 +96,8 @@ function showScreen(which) {
   document.getElementById('access-denied').style.display   = which === 'denied'    ? 'flex'  : 'none';
   document.getElementById('dashboard-shell').style.display = which === 'dashboard' ? 'grid'  : 'none';
 
+  // Clear the inline visibility:hidden on <body> so the CSS class can take effect
+  document.body.style.visibility = 'visible';
   document.body.classList.add('auth-ready');
   document.body.classList.remove('auth-pending');
 }
