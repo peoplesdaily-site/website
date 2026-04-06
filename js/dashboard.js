@@ -209,6 +209,17 @@ async function loadOverview() {
 
   // Recent 10 in table
   renderTable(allArticles.slice(0, 10), 'overview-table-wrap');
+
+  // Hero order panel — show featured articles sorted by display_order then published_at
+  const featured = allArticles
+    .filter(a => a.is_featured && a.status === 'published')
+    .sort((a, b) => {
+      if (a.display_order && b.display_order) return a.display_order - b.display_order;
+      if (a.display_order) return -1;
+      if (b.display_order) return 1;
+      return new Date(b.published_at) - new Date(a.published_at);
+    });
+  renderHeroOrderPanel(featured);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -349,6 +360,12 @@ function editArticle(id) {
   document.getElementById('form-image-url').value = a.image_url || '';
   document.getElementById('form-featured').checked = !!a.is_featured;
 
+  // Populate the rich editor
+  const editorEl = document.getElementById('rich-editor');
+  if (editorEl) {
+    editorEl.innerHTML = a.content || '';
+  }
+
   // Show image preview if URL exists
   if (a.image_url) {
     document.getElementById('upload-preview').innerHTML =
@@ -364,19 +381,34 @@ function editArticle(id) {
 function resetForm() {
   document.getElementById('article-form').reset();
   document.getElementById('form-id').value = '';
+  document.getElementById('form-slug').value = '';
   document.getElementById('upload-preview').innerHTML = '';
   document.getElementById('upload-status').textContent = '';
   document.getElementById('form-panel-title').textContent = 'Create New Article';
+
+  // Clear rich editor
+  const editorEl = document.getElementById('rich-editor');
+  if (editorEl) editorEl.innerHTML = '';
 }
 
 /** Save article (create or update) */
 async function saveArticle(statusOverride) {
-  const id       = document.getElementById('form-id').value;
-  const title    = document.getElementById('form-title').value.trim();
-  const slug     = document.getElementById('form-slug').value.trim();
+  // Sync rich editor content to the hidden textarea first
+  const editorEl = document.getElementById('rich-editor');
+  if (editorEl) {
+    document.getElementById('form-content').value = editorEl.innerHTML.trim();
+  }
 
-  if (!title || !slug) {
-    toast('Title and slug are required.', 'error');
+  const id    = document.getElementById('form-id').value;
+  const title = document.getElementById('form-title').value.trim();
+  const slug  = document.getElementById('form-slug').value.trim();
+
+  if (!title) {
+    toast('Please enter an article title.', 'error');
+    return;
+  }
+  if (!slug) {
+    toast('Could not generate a URL for this article. Please check the title.', 'error');
     return;
   }
 
@@ -621,4 +653,147 @@ function escHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+// ══════════════════════════════════════════════════════════
+// RICH TEXT EDITOR
+// ══════════════════════════════════════════════════════════
+
+function rfmt(cmd) {
+  const editor = document.getElementById('rich-editor');
+  editor.focus();
+
+  if (cmd === 'bold')       document.execCommand('bold', false, null);
+  else if (cmd === 'italic')    document.execCommand('italic', false, null);
+  else if (cmd === 'underline') document.execCommand('underline', false, null);
+  else if (cmd === 'heading')   document.execCommand('formatBlock', false, 'h2');
+  else if (cmd === 'subheading') document.execCommand('formatBlock', false, 'h3');
+  else if (cmd === 'para')      document.execCommand('formatBlock', false, 'p');
+  else if (cmd === 'ul')        document.execCommand('insertUnorderedList', false, null);
+  else if (cmd === 'ol')        document.execCommand('insertOrderedList', false, null);
+  else if (cmd === 'quote')     document.execCommand('formatBlock', false, 'blockquote');
+  else if (cmd === 'link') {
+    const url = prompt('Enter the link URL:');
+    if (url) document.execCommand('createLink', false, url);
+  }
+  else if (cmd === 'clear')     document.execCommand('removeFormat', false, null);
+}
+
+// ══════════════════════════════════════════════════════════
+// HERO ARTICLE ORDERING
+// ══════════════════════════════════════════════════════════
+
+let heroOrderIds = []; // current drag order of featured article IDs
+
+function renderHeroOrderPanel(featuredArticles) {
+  const wrap = document.getElementById('hero-order-wrap');
+  if (!wrap) return;
+
+  if (!featuredArticles || featuredArticles.length === 0) {
+    wrap.innerHTML = `
+      <div class="dash-panel-body" style="color:var(--text-muted);font-size:13px">
+        No featured articles yet. Mark articles as "Featured" to control their homepage order.
+      </div>`;
+    return;
+  }
+
+  heroOrderIds = featuredArticles.map(a => a.id);
+
+  wrap.innerHTML = `
+    <div class="hero-order-list" id="hero-order-list">
+      ${featuredArticles.map((a, i) => `
+        <div class="hero-order-item" draggable="true" data-id="${a.id}">
+          <span class="hero-drag-handle">⠿</span>
+          <span class="hero-order-rank" style="font-size:11px;font-weight:700;color:var(--text-muted);min-width:18px">#${i+1}</span>
+          ${a.image_url
+            ? `<img src="${a.image_url}" class="hero-order-thumb" onerror="this.style.display='none'">`
+            : `<div class="hero-order-thumb" style="background:var(--border)"></div>`}
+          <div class="hero-order-info">
+            <div class="hero-order-title">${escHtml(a.title)}</div>
+            <div class="hero-order-meta">${a.category || 'Uncategorised'} · ${a.published_at ? new Date(a.published_at).toLocaleDateString('en-GB') : 'No date'}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="hero-save-bar">
+      <span class="hero-save-info">Drag articles up or down to change the order they appear on the homepage hero section.</span>
+      <button class="btn btn-primary btn-sm" onclick="saveHeroOrder()">Save Order</button>
+    </div>
+  `;
+
+  // Wire up drag-and-drop
+  initHeroDragDrop();
+}
+
+function initHeroDragDrop() {
+  const list = document.getElementById('hero-order-list');
+  if (!list) return;
+
+  let dragSrc = null;
+
+  list.querySelectorAll('.hero-order-item').forEach(item => {
+    item.addEventListener('dragstart', function(e) {
+      dragSrc = this;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => this.style.opacity = '0.4', 0);
+    });
+    item.addEventListener('dragend', function() {
+      this.style.opacity = '';
+      list.querySelectorAll('.hero-order-item').forEach(i => i.classList.remove('drag-over'));
+      // Rebuild heroOrderIds from current DOM order
+      heroOrderIds = [...list.querySelectorAll('.hero-order-item')].map(el => el.dataset.id);
+      // Update rank numbers
+      list.querySelectorAll('.hero-order-rank').forEach((el, i) => el.textContent = '#' + (i+1));
+    });
+    item.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (this !== dragSrc) {
+        list.querySelectorAll('.hero-order-item').forEach(i => i.classList.remove('drag-over'));
+        this.classList.add('drag-over');
+      }
+    });
+    item.addEventListener('drop', function(e) {
+      e.preventDefault();
+      if (this !== dragSrc) {
+        const items = [...list.querySelectorAll('.hero-order-item')];
+        const srcIdx = items.indexOf(dragSrc);
+        const tgtIdx = items.indexOf(this);
+        if (srcIdx < tgtIdx) {
+          list.insertBefore(dragSrc, this.nextSibling);
+        } else {
+          list.insertBefore(dragSrc, this);
+        }
+      }
+    });
+  });
+}
+
+async function saveHeroOrder() {
+  // Save display_order to each featured article in Supabase.
+  // Requires a display_order INTEGER column in your articles table.
+  // Run this SQL in Supabase once:
+  //   ALTER TABLE articles ADD COLUMN IF NOT EXISTS display_order integer DEFAULT 0;
+  if (heroOrderIds.length === 0) { toast('Nothing to save.', 'error'); return; }
+
+  const updates = heroOrderIds.map((id, idx) =>
+    _supabase.from('articles').update({ display_order: idx + 1 }).eq('id', id)
+  );
+
+  const results = await Promise.all(updates);
+  const failed = results.filter(r => r.error);
+
+  if (failed.length > 0) {
+    // Likely the display_order column doesn't exist yet
+    toast('Could not save order. Please add the display_order column to your articles table in Supabase. See comments in dashboard.js for the SQL.', 'error');
+    return;
+  }
+
+  toast('Hero order saved! Homepage will reflect the new order.', 'success');
+  // Refresh cached articles
+  allArticles = allArticles.map(a => {
+    const newOrder = heroOrderIds.indexOf(a.id);
+    if (newOrder !== -1) return { ...a, display_order: newOrder + 1 };
+    return a;
+  });
 }
