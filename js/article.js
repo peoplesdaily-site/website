@@ -142,6 +142,50 @@
 
   showArticle();
 
+  // ── Prev / Next article navigation ───────────────────────
+
+  const pubAt = article.published_at;
+  if (pubAt) {
+    const [prevRes, nextRes] = await Promise.all([
+      _supabase.from('articles')
+        .select('title, slug, category')
+        .eq('status', 'published')
+        .lt('published_at', pubAt)
+        .order('published_at', { ascending: false })
+        .limit(1),
+      _supabase.from('articles')
+        .select('title, slug, category')
+        .eq('status', 'published')
+        .gt('published_at', pubAt)
+        .order('published_at', { ascending: true })
+        .limit(1)
+    ]);
+
+    const prev = prevRes.data?.[0] || null;
+    const next = nextRes.data?.[0] || null;
+
+    if (prev || next) {
+      const navEl = document.getElementById('article-nav');
+      navEl.style.display = 'block';
+      navEl.innerHTML = `
+        <div class="article-nav">
+          ${prev
+            ? `<a class="article-nav-link nav-prev" href="article.html?slug=${encodeURIComponent(prev.slug)}">
+                <div class="article-nav-label">← Previous Article</div>
+                <div class="article-nav-title">${prev.title}</div>
+               </a>`
+            : `<span class="article-nav-placeholder"></span>`}
+          ${next
+            ? `<a class="article-nav-link nav-next" href="article.html?slug=${encodeURIComponent(next.slug)}">
+                <div class="article-nav-label">Next Article →</div>
+                <div class="article-nav-title">${next.title}</div>
+               </a>`
+            : `<span class="article-nav-placeholder"></span>`}
+        </div>
+      `;
+    }
+  }
+
   // ── Fetch sidebar: recent articles ───────────────────────
 
   const { data: recent } = await _supabase
