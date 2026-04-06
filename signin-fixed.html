@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In — People's Daily News Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#1e3a5c;
+      --accent:#c0392b;
+      --accent-light:#e74c3c;
+      --bg:#f4f6f9;
+      --surface:#ffffff;
+      --border:#e0e0e0;
+      --text:#111111;
+      --text-muted:#6f7782;
+      --success:#1f8b4c;
+      --font-ui:'Barlow',sans-serif;
+      --font-disp:'Playfair Display',Georgia,serif;
+      --radius:6px;
+      --shadow:0 16px 50px rgba(0,0,0,0.14);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      min-height:100vh;
+      font-family:var(--font-ui);
+      background:linear-gradient(135deg,#173152 0%,#0f223c 55%,#0b1a2f 100%);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    a{text-decoration:none;color:inherit}
+    .auth-shell{
+      width:100%;
+      max-width:460px;
+      background:var(--surface);
+      border-radius:14px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .auth-top{
+      padding:26px 28px 18px;
+      border-bottom:1px solid var(--border);
+      text-align:center;
+    }
+    .auth-top img{
+      height:74px;
+      width:auto;
+      margin:0 auto 12px;
+      object-fit:contain;
+    }
+    .auth-top h1{
+      font-family:var(--font-disp);
+      font-size:30px;
+      color:var(--primary);
+      margin-bottom:6px;
+    }
+    .auth-top p{
+      font-size:13px;
+      color:var(--text-muted);
+    }
+    .auth-tabs{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      border-bottom:1px solid var(--border);
+    }
+    .auth-tab{
+      border:none;
+      background:#fff;
+      padding:14px 16px;
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+      color:var(--text-muted);
+      cursor:pointer;
+    }
+    .auth-tab.active{
+      color:var(--primary);
+      box-shadow:inset 0 -3px 0 var(--accent);
+    }
+    .auth-body{padding:24px 28px 28px}
+    .panel{display:none}
+    .panel.active{display:block}
+    .form-group{margin-bottom:15px}
+    .form-group label{
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      color:var(--text-muted);
+      margin-bottom:7px;
+    }
+    .form-group input{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:12px 13px;
+      font-size:14px;
+      font-family:var(--font-ui);
+    }
+    .form-group input:focus{
+      outline:none;
+      border-color:var(--primary);
+    }
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:var(--radius);
+      padding:12px 14px;
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.6px;
+      cursor:pointer;
+    }
+    .btn-primary{
+      background:var(--accent);
+      color:#fff;
+    }
+    .btn-primary:hover{background:var(--accent-light)}
+    .btn-secondary{
+      margin-top:10px;
+      background:#fff;
+      border:1px solid var(--border);
+      color:var(--primary);
+    }
+    .helper{
+      margin-top:16px;
+      font-size:12px;
+      color:var(--text-muted);
+      text-align:center;
+      line-height:1.6;
+    }
+    .message{
+      display:none;
+      margin-bottom:14px;
+      padding:12px 14px;
+      border-radius:var(--radius);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .message.error{
+      background:#fdf0ee;
+      border:1px solid #f5c6c2;
+      color:#b93226;
+    }
+    .message.success{
+      background:#edf9f1;
+      border:1px solid #cfead8;
+      color:var(--success);
+    }
+    .signed-in-box{
+      display:none;
+      text-align:center;
+      padding:18px 8px 4px;
+    }
+    .signed-in-box h2{
+      font-family:var(--font-disp);
+      font-size:26px;
+      color:var(--primary);
+      margin-bottom:8px;
+    }
+    .signed-in-box p{
+      color:var(--text-muted);
+      font-size:13px;
+      margin-bottom:18px;
+      line-height:1.6;
+    }
+    .action-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:8px;
+    }
+    .ghost-link{
+      display:inline-block;
+      margin-top:16px;
+      font-size:12px;
+      color:var(--primary);
+      font-weight:700;
+    }
+    @media (max-width:520px){
+      .auth-top{padding:22px 20px 16px}
+      .auth-body{padding:20px}
+      .action-row{grid-template-columns:1fr}
+      .auth-top img{height:62px}
+      .auth-top h1{font-size:26px}
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-top">
+      <img src="images/thumbnail (6).png" alt="People's Daily News Online" onerror="this.style.display='none'">
+      <h1>Sign In</h1>
+      <p>Create an account or sign in. Admins will see the dashboard button after login.</p>
+    </div>
+
+    <div id="signed-in-box" class="signed-in-box">
+      <h2>You're signed in</h2>
+      <p id="signed-in-copy">Your session is active.</p>
+      <div class="action-row">
+        <a href="index.html" class="btn btn-primary" style="text-align:center;display:inline-block">Go to Home</a>
+        <a href="dashboard.html" id="signed-in-dashboard-link" class="btn btn-secondary" style="text-align:center;display:none">Open Dashboard</a>
+      </div>
+      <button class="btn btn-secondary" style="margin-top:10px" onclick="doSignOut()">Sign Out</button>
+    </div>
+
+    <div id="auth-area">
+      <div class="auth-tabs">
+        <button class="auth-tab active" type="button" onclick="showPanel('signin')">Sign In</button>
+        <button class="auth-tab" type="button" onclick="showPanel('signup')">Create Account</button>
+      </div>
+
+      <div class="auth-body">
+        <div id="signin-panel" class="panel active">
+          <div id="signin-message" class="message"></div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="signin-password" placeholder="Enter your password" autocomplete="current-password">
+          </div>
+          <button class="btn btn-primary" type="button" onclick="doSignIn()">Sign In</button>
+          <p class="helper">Admins use the same sign-in form. The dashboard button appears only for the admin account.</p>
+        </div>
+
+        <div id="signup-panel" class="panel">
+          <div id="signup-message" class="message"></div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="signup-password" placeholder="Create a password" autocomplete="new-password">
+          </div>
+          <button class="btn btn-primary" type="button" onclick="doSignUp()">Create Account</button>
+          
+        </div>
+
+        <a href="index.html" class="ghost-link">← Return to homepage</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script>
+    const ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
+    const EMAIL_REDIRECT_TO = 'https://peoplesdaily-site.github.io/website/signin.html';
+
+    function showPanel(which) {
+      document.querySelectorAll('.auth-tab').forEach((tab, i) => {
+        tab.classList.toggle('active', (which === 'signin' && i === 0) || (which === 'signup' && i === 1));
+      });
+      document.getElementById('signin-panel').classList.toggle('active', which === 'signin');
+      document.getElementById('signup-panel').classList.toggle('active', which === 'signup');
+    }
+
+    function showMessage(id, text, type) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className = 'message ' + type;
+      el.style.display = 'block';
+    }
+
+    function clearMessages() {
+      document.querySelectorAll('.message').forEach(el => {
+        el.style.display = 'none';
+        el.textContent = '';
+      });
+    }
+
+    async function doSignIn() {
+      clearMessages();
+      const email = document.getElementById('signin-email').value.trim();
+      const password = document.getElementById('signin-password').value;
+
+      if (!email || !password) {
+        showMessage('signin-message', 'Please enter your email and password.', 'error');
+        return;
+      }
+
+      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        showMessage('signin-message', error.message, 'error');
+        return;
+      }
+
+      const user = data.user;
+      if (user && user.email === ADMIN_EMAIL) {
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
+    async function doSignUp() {
+      clearMessages();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+
+      if (!email || !password) {
+        showMessage('signup-message', 'Please enter an email and password.', 'error');
+        return;
+      }
+
+      if (password.length < 6) {
+        showMessage('signup-message', 'Password should be at least 6 characters long.', 'error');
+        return;
+      }
+
+      const { data, error } = await _supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: EMAIL_REDIRECT_TO
+        }
+      });
+
+      if (error) {
+        showMessage('signup-message', error.message, 'error');
+        return;
+      }
+
+      if (data.user && !data.session) {
+        showMessage('signup-message', 'Account created. Check your email if confirmation is required, then sign in.', 'success');
+      } else {
+        showMessage('signup-message', 'Account created and signed in. You can go back home now.', 'success');
+      }
+    }
+
+    async function doSignOut() {
+      await _supabase.auth.signOut();
+      location.reload();
+    }
+
+
+    function readAuthErrorsFromUrl() {
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const query = new URLSearchParams(window.location.search);
+      const errorCode = hash.get('error_code') || query.get('error_code');
+      const errorDescription = hash.get('error_description') || query.get('error_description');
+
+      if (!errorCode && !errorDescription) return;
+
+      let message = errorDescription || 'Authentication link failed.';
+      try { message = decodeURIComponent(message.replace(/\+/g, ' ')); } catch (e) {}
+
+      if ((errorCode || '').includes('otp_expired') || /expired/i.test(message)) {
+        message = 'That email confirmation link has expired. Please create the account again or request a fresh confirmation email.';
+      }
+
+      showPanel('signin');
+      showMessage('signin-message', message, 'error');
+
+      if (window.location.hash) {
+        history.replaceState({}, document.title, window.location.pathname + window.location.search);
+      }
+    }
+
+    async function syncSignedInState() {
+      const { data } = await _supabase.auth.getSession();
+      const user = data && data.session ? data.session.user : null;
+
+      const signedInBox = document.getElementById('signed-in-box');
+      const authArea = document.getElementById('auth-area');
+      const dashLink = document.getElementById('signed-in-dashboard-link');
+      const signedInCopy = document.getElementById('signed-in-copy');
+
+      if (user) {
+        authArea.style.display = 'none';
+        signedInBox.style.display = 'block';
+        if (user.email === ADMIN_EMAIL) {
+          signedInCopy.textContent = 'You are signed in as the admin account. Your dashboard is available.';
+          dashLink.style.display = 'inline-block';
+        } else {
+          signedInCopy.textContent = 'You are signed in. Go back home to continue browsing.';
+          dashLink.style.display = 'none';
+        }
+      } else {
+        authArea.style.display = 'block';
+        signedInBox.style.display = 'none';
+      }
+    }
+
+    document.getElementById('signin-password').addEventListener('keydown', function(e){
+      if (e.key === 'Enter') doSignIn();
+    });
+    document.getElementById('signup-password').addEventListener('keydown', function(e){
+      if (e.key === 'Enter') doSignUp();
+    });
+
+    readAuthErrorsFromUrl();
+    syncSignedInState();
+    _supabase.auth.onAuthStateChange(function () {
+      readAuthErrorsFromUrl();
+    syncSignedInState();
+    });
+  </script>
+</body>
+</html>
