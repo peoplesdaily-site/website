@@ -317,6 +317,36 @@
       .stat-grid { grid-template-columns: 1fr; }
       .dash-content { padding: 16px; }
     }
+
+    /* ── Rich text editor ─────────────────────────────────── */
+    .rich-toolbar { display:flex; gap:3px; flex-wrap:wrap; padding:8px 10px; background:#f0f4f8; border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; align-items:center; }
+    .rich-toolbar button { background:transparent; border:none; padding:5px 9px; border-radius:3px; cursor:pointer; font-size:13px; font-weight:600; color:var(--text); transition:background 0.15s; line-height:1; font-family:var(--font-ui); }
+    .rich-toolbar button:hover { background:rgba(30,58,92,0.12); }
+    .rich-toolbar button.active { background:var(--primary); color:#fff; }
+    .rich-toolbar .sep { width:1px; height:20px; background:var(--border); margin:0 5px; display:inline-block; }
+    .rich-editor { border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); min-height:300px; max-height:600px; overflow-y:auto; padding:16px 18px; font-size:14px; line-height:1.75; color:var(--text); background:#fff; outline:none; }
+    .rich-editor:focus { border-color:var(--primary); }
+    .rich-editor p { margin-bottom:14px; }
+    .rich-editor h2 { font-family:var(--font-disp); font-size:20px; font-weight:700; margin:22px 0 10px; }
+    .rich-editor blockquote { border-left:3px solid var(--accent); padding:10px 16px; margin:16px 0; background:#fdf7f7; font-style:italic; color:var(--text-muted); }
+    .rich-editor ul { padding-left:22px; margin-bottom:14px; list-style:disc; }
+    .rich-editor ol { padding-left:22px; margin-bottom:14px; list-style:decimal; }
+    .rich-editor li { margin-bottom:6px; }
+    .rich-editor:empty::before { content:attr(data-placeholder); color:var(--text-muted); pointer-events:none; display:block; }
+
+    /* ── Hero reorder panel ───────────────────────────────── */
+    .hero-order-list { display:flex; flex-direction:column; }
+    .hero-order-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--border); background:#fff; cursor:grab; transition:background 0.15s; }
+    .hero-order-item:last-child { border-bottom:none; }
+    .hero-order-item:hover { background:var(--bg); }
+    .hero-order-item.drag-over { border-top:2px solid var(--primary); }
+    .hero-drag-handle { color:var(--text-muted); font-size:15px; cursor:grab; user-select:none; flex-shrink:0; }
+    .hero-order-thumb { width:48px; height:34px; object-fit:cover; border-radius:2px; background:var(--border); flex-shrink:0; display:block; }
+    .hero-order-info { flex:1; min-width:0; }
+    .hero-order-title { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .hero-order-meta { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .hero-save-bar { padding:12px 20px; background:var(--bg); border-top:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+    .hero-save-info { font-size:12px; color:var(--text-muted); flex:1; }
   </style>
 </head>
 <body class="auth-pending" style="visibility:hidden">
@@ -443,6 +473,17 @@
             <div id="overview-table-wrap"><div class="spinner"></div></div>
           </div>
         </div>
+
+        <!-- Hero Order Panel -->
+        <div class="dash-panel">
+          <div class="dash-panel-header">
+            <span class="dash-panel-title">🏠 Homepage Hero — Article Order</span>
+            <span style="font-size:11px;color:var(--text-muted)">Drag to rearrange which featured articles appear first</span>
+          </div>
+          <div id="hero-order-wrap">
+            <div class="spinner"></div>
+          </div>
+        </div>
       </div>
 
       <!-- ══ VIEW: ALL ARTICLES ════════════════════════ -->
@@ -488,13 +529,11 @@
                 </div>
               </div>
 
-              <!-- Row 2: Slug + Category -->
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Slug (URL path) *</label>
-                  <input type="text" id="form-slug" placeholder="article-url-slug" required>
-                  <span class="form-hint">Auto-generated from title. Must be unique.</span>
-                </div>
+              <!-- Hidden slug field – auto-generated from title -->
+              <input type="hidden" id="form-slug">
+
+              <!-- Row 2: Category -->
+              <div class="form-row full">
                 <div class="form-group">
                   <label>Category</label>
                   <select id="form-category">
@@ -568,8 +607,32 @@
               <div class="form-row full">
                 <div class="form-group">
                   <label>Full Article Content</label>
-                  <textarea id="form-content" class="tall" placeholder="Write the full article body here. Use double line breaks to create new paragraphs. You may also paste HTML."></textarea>
-                  <span class="form-hint">Separate paragraphs with a blank line. You can use HTML tags like &lt;h2&gt;, &lt;blockquote&gt;, &lt;strong&gt;, etc.</span>
+                  <!-- Toolbar -->
+                  <div class="rich-toolbar" id="rich-toolbar">
+                    <button type="button" title="Bold" onclick="rfmt('bold')"><b>B</b></button>
+                    <button type="button" title="Italic" onclick="rfmt('italic')"><i>I</i></button>
+                    <button type="button" title="Underline" onclick="rfmt('underline')"><u>U</u></button>
+                    <span class="sep"></span>
+                    <button type="button" title="Heading" onclick="rfmt('heading')">H2</button>
+                    <button type="button" title="Sub-heading" onclick="rfmt('subheading')">H3</button>
+                    <button type="button" title="Normal paragraph" onclick="rfmt('para')">¶</button>
+                    <span class="sep"></span>
+                    <button type="button" title="Bullet list" onclick="rfmt('ul')">• List</button>
+                    <button type="button" title="Numbered list" onclick="rfmt('ol')">1. List</button>
+                    <span class="sep"></span>
+                    <button type="button" title="Quote block" onclick="rfmt('quote')">" Quote</button>
+                    <span class="sep"></span>
+                    <button type="button" title="Add link" onclick="rfmt('link')">🔗 Link</button>
+                    <button type="button" title="Remove formatting" onclick="rfmt('clear')" style="color:var(--accent)">✕ Clear</button>
+                  </div>
+                  <!-- Editor area -->
+                  <div id="rich-editor"
+                       class="rich-editor"
+                       contenteditable="true"
+                       data-placeholder="Start writing your article here… Use the toolbar above to add headings, bold text, bullet points, quotes, and more. No coding needed!">
+                  </div>
+                  <!-- Hidden textarea that holds the value for saving -->
+                  <textarea id="form-content" style="display:none"></textarea>
                 </div>
               </div>
 
