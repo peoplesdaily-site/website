@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Loading… — People's Daily News Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Variables (same as index.html) ───────────────────── */
+    :root {
+      --primary:       #1e3a5c;
+      --accent:        #c0392b;
+      --accent-light:  #e74c3c;
+      --gold:          #4a6080;
+      --bg:            #ffffff;
+      --bg-soft:       #f7f7f7;
+      --bg-mid:        #f0f0f0;
+      --border:        #e0e0e0;
+      --border-dark:   #cccccc;
+      --text-primary:  #111111;
+      --text-secondary:#444444;
+      --text-muted:    #777777;
+      --font-display:  'Playfair Display', Georgia, serif;
+      --font-body:     'Source Serif 4', Georgia, serif;
+      --font-ui:       'Barlow', sans-serif;
+      --shadow-sm:     0 1px 4px rgba(0,0,0,0.08);
+      --shadow-md:     0 4px 16px rgba(0,0,0,0.10);
+      --radius:        3px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); background: var(--bg); color: var(--text-primary); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Top bar ────────────────────────────────────────── */
+    .top-bar { background: var(--primary); color: rgba(255,255,255,0.75); font-family: var(--font-ui); font-size: 11.5px; border-bottom: 2px solid var(--accent); }
+    .top-bar-inner { display:flex; align-items:center; justify-content:space-between; height:34px; }
+
+    /* ── Masthead ──────────────────────────────────────── */
+    .masthead { background: var(--bg); padding: 18px 0 14px; border-bottom: 1px solid var(--border); }
+    .masthead-inner { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+    .logo-wrap { display:flex; align-items:center; gap:14px; }
+    .logo-img { height:64px; width:auto; object-fit:contain; border-radius:6px; }
+    .logo-name { font-family:var(--font-display); font-size:32px; font-weight:800; color:var(--primary); }
+    .logo-name em { color:var(--accent); font-style:normal; }
+    .masthead-actions { display:flex; gap:10px; }
+    .btn { font-family:var(--font-ui); font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; padding:9px 20px; border-radius:var(--radius); cursor:pointer; border:none; display:inline-block; }
+    .btn-outline { background:transparent; color:var(--primary); border:1.5px solid var(--primary); }
+    .btn-primary { background:var(--accent); color:#fff; }
+    .btn-primary:hover { background:var(--accent-light); }
+
+    /* ── Navbar ────────────────────────────────────────── */
+    .navbar { background:var(--primary); position:sticky; top:0; z-index:100; box-shadow:var(--shadow-md); }
+    .navbar-inner { display:flex; align-items:center; justify-content:space-between; height:44px; }
+    .nav-list { display:flex; align-items:center; height:100%; }
+    .nav-list li { height:100%; }
+    .nav-list a { font-family:var(--font-ui); font-size:12px; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:rgba(255,255,255,0.80); display:flex; align-items:center; height:100%; padding:0 14px; border-bottom:3px solid transparent; transition:color 0.2s, border-color 0.2s; }
+    .nav-list a:hover { color:#fff; border-bottom-color:var(--accent); }
+    .nav-list .nav-dashboard a { color:var(--gold); }
+    .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:8px; }
+    .hamburger span { width:22px; height:2px; background:#fff; border-radius:2px; display:block; }
+
+    /* ── Article page layout ────────────────────────────── */
+    .article-page { padding: 40px 0 60px; }
+    .article-layout { display:grid; grid-template-columns: 1fr 300px; gap:48px; align-items:start; }
+
+    /* ── Article header ─────────────────────────────────── */
+    .article-breadcrumb { font-family:var(--font-ui); font-size:11px; color:var(--text-muted); margin-bottom:16px; }
+    .article-breadcrumb a { color:var(--primary); font-weight:600; }
+    .article-breadcrumb a:hover { text-decoration:underline; }
+
+    .article-category-tag { font-family:var(--font-ui); font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 10px; border-radius:2px; display:inline-block; margin-bottom:16px; }
+    .tag-red   { background:var(--accent); color:#fff; }
+    .tag-navy  { background:var(--primary); color:#fff; }
+    .tag-gold  { background:var(--gold); color:#fff; }
+    .tag-outline { border:1px solid var(--border-dark); color:var(--text-muted); }
+
+    .article-title { font-family:var(--font-display); font-size:36px; font-weight:800; line-height:1.2; color:var(--text-primary); margin-bottom:16px; }
+    .article-excerpt { font-family:var(--font-ui); font-size:16px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px; border-left:3px solid var(--accent); padding-left:16px; }
+    .article-meta { display:flex; align-items:center; flex-wrap:wrap; gap:16px; font-family:var(--font-ui); font-size:12px; color:var(--text-muted); padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:28px; }
+    .article-meta strong { color:var(--text-secondary); }
+    .article-meta .source { font-weight:700; color:var(--primary); }
+
+    /* ── Article hero image ─────────────────────────────── */
+    .article-hero-img { width:100%; max-height:480px; object-fit:cover; border-radius:var(--radius); margin-bottom:28px; display:block; }
+    .img-placeholder { background:linear-gradient(135deg, #dde1e7 0%, #c8ccd2 100%); display:flex; align-items:center; justify-content:center; border-radius:var(--radius); margin-bottom:28px; }
+    .img-placeholder svg { width:48px; height:48px; opacity:0.3; }
+
+    /* ── Article body content ───────────────────────────── */
+    .article-body { font-family:var(--font-body); font-size:17px; line-height:1.8; color:var(--text-primary); }
+    .article-body p { margin-bottom:20px; }
+    .article-body h2 { font-family:var(--font-display); font-size:24px; font-weight:700; margin:36px 0 16px; color:var(--text-primary); }
+    .article-body h3 { font-family:var(--font-display); font-size:20px; font-weight:600; margin:28px 0 12px; }
+    .article-body blockquote { border-left:4px solid var(--accent); margin:28px 0; padding:16px 20px; background:var(--bg-soft); font-style:italic; color:var(--text-secondary); border-radius:0 var(--radius) var(--radius) 0; }
+    .article-body ul, .article-body ol { padding-left:24px; margin-bottom:20px; }
+    .article-body li { margin-bottom:8px; }
+    .article-body strong { font-weight:600; }
+    .article-body a { color:var(--primary); text-decoration:underline; }
+
+    /* ── Loading / error states ─────────────────────────── */
+    .loading-state { text-align:center; padding:80px 0; font-family:var(--font-ui); }
+    .loading-spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .error-state { text-align:center; padding:80px 0; font-family:var(--font-ui); }
+    .error-state h2 { font-family:var(--font-display); font-size:24px; margin-bottom:12px; color:var(--text-primary); }
+    .error-state p { color:var(--text-muted); margin-bottom:20px; }
+
+    /* ── Related articles ───────────────────────────────── */
+    .related-section { margin-top:48px; padding-top:28px; border-top:2px solid var(--border); }
+    .section-label { font-family:var(--font-ui); font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-muted); display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .section-label.accent { color:var(--accent); }
+    .section-label.accent::before { content:''; width:4px; height:14px; background:var(--accent); border-radius:1px; display:inline-block; }
+    .related-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+    .news-card { border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); background:var(--bg); cursor:pointer; transition:box-shadow 0.25s, transform 0.25s; }
+    .news-card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
+    .news-card-body { padding:14px 16px 16px; }
+    .news-card-title { font-family:var(--font-display); font-size:15px; font-weight:600; line-height:1.35; color:var(--text-primary); margin-bottom:8px; }
+    .news-card:hover .news-card-title { color:var(--accent); }
+    .news-card-meta { font-family:var(--font-ui); font-size:11px; color:var(--text-muted); padding-top:8px; border-top:1px solid var(--border); }
+
+    /* ── Sidebar ────────────────────────────────────────── */
+    .sidebar-widget { margin-bottom:30px; }
+    .sidebar-widget-title { font-family:var(--font-ui); font-size:10px; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:#fff; background:var(--primary); padding:8px 14px; border-radius:var(--radius) var(--radius) 0 0; }
+    .sidebar-widget-body { border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); }
+    .sidebar-list-item { display:flex; gap:10px; padding:11px 12px; border-bottom:1px solid var(--border); align-items:start; cursor:pointer; transition:background 0.15s; }
+    .sidebar-list-item:last-child { border-bottom:none; }
+    .sidebar-list-item:hover { background:var(--bg-soft); }
+    .sidebar-num { font-family:var(--font-display); font-size:20px; font-weight:800; color:var(--border-dark); line-height:1; min-width:22px; }
+    .sidebar-list-title { font-family:var(--font-display); font-size:13px; font-weight:600; line-height:1.3; color:var(--text-primary); }
+    .sidebar-list-item:hover .sidebar-list-title { color:var(--accent); }
+    .sidebar-mini-meta { font-family:var(--font-ui); font-size:10px; color:var(--text-muted); margin-top:3px; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .footer-top { background:#0d2240; padding:48px 0 36px; border-top:3px solid var(--accent); }
+    .footer-grid { display:grid; grid-template-columns:1.9fr 1fr 1fr; gap:40px; }
+    .footer-col h5 { font-family:var(--font-ui); font-size:10px; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:#fff; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .footer-col ul li { margin-bottom:9px; }
+    .footer-col ul li a { font-family:var(--font-ui); font-size:13px; color:rgba(255,255,255,0.6); transition:color 0.2s; }
+    .footer-col ul li a:hover { color:#fff; }
+    .footer-logo-img { height:56px; width:auto; object-fit:contain; border-radius:6px; }
+    .footer-bottom { background:#091a30; padding:16px 0; }
+    .footer-bottom-inner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+    .footer-copyright { font-family:var(--font-ui); font-size:11.5px; color:rgba(255,255,255,0.35); }
+
+    /* ── Mobile ─────────────────────────────────────────── */
+    .mobile-menu { display:none; position:fixed; inset:0; background:var(--primary); z-index:200; flex-direction:column; overflow-y:auto; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+    .close-btn { background:none; border:none; color:#fff; font-size:26px; cursor:pointer; }
+    .mobile-nav-list li a { display:block; font-family:var(--font-ui); font-size:15px; font-weight:600; color:rgba(255,255,255,0.85); padding:14px 24px; border-bottom:1px solid rgba(255,255,255,0.07); }
+
+    @media (max-width:900px) {
+      .article-layout { grid-template-columns:1fr; }
+      .article-title { font-size:28px; }
+      .related-grid { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width:700px) {
+      .nav-list { display:none; }
+      .hamburger { display:flex; }
+      .article-title { font-size:24px; }
+      .related-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-inner">
+      <span id="current-date"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Masthead -->
+<header class="masthead">
+  <div class="container">
+    <div class="masthead-inner">
+      <a href="index.html" class="logo-wrap">
+        <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="logo-img"
+             onerror="this.outerHTML='<span class=\'logo-name\'>People\'s <em>Daily</em></span>'">
+      </a>
+      <div class="masthead-actions">
+        <a href="index.html" class="btn btn-outline">← Back to News</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-inner">
+      <ul class="nav-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html">Politics</a></li>
+        <li><a href="index.html">Local News</a></li>
+        <li><a href="index.html">Crime</a></li>
+        <li><a href="index.html">Business</a></li>
+        <li><a href="index.html">Sports</a></li>
+        <li><a href="index.html">Entertainment</a></li>
+        <li><a href="index.html">World</a></li>
+        <li><a href="index.html">Opinion</a></li>
+        <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
+      </ul>
+      <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- Article Content -->
+<div class="article-page">
+  <div class="container">
+
+    <!-- Loading state -->
+    <div id="loading-state" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p style="font-family:var(--font-ui);color:var(--text-muted)">Loading article…</p>
+    </div>
+
+    <!-- Error state (hidden initially) -->
+    <div id="error-state" class="error-state" style="display:none">
+      <h2>Article not found</h2>
+      <p>The article you're looking for could not be loaded.</p>
+      <a href="index.html" class="btn btn-primary">Return to Homepage</a>
+    </div>
+
+    <!-- Article layout (hidden until loaded) -->
+    <div id="article-layout" class="article-layout" style="display:none">
+      <main id="article-main"><!-- filled by JS --></main>
+      <aside id="article-sidebar"><!-- filled by JS --></aside>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-top">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="footer-logo-img"
+               onerror="this.style.display='none'">
+        </div>
+        <div class="footer-col">
+          <h5>Sections</h5>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html">Politics</a></li>
+            <li><a href="index.html">Local News</a></li>
+            <li><a href="index.html">Sports</a></li>
+            <li><a href="index.html">Entertainment</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="dashboard.html">News Dashboard</a></li>
+            <li><a href="#">Advertise With Us</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="footer-bottom-inner">
+        <span class="footer-copyright">&copy; 2026 People's Daily News Online. All rights reserved.</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-header">
+    <img src="images/thumbnail (6).png" alt="" style="height:36px;width:auto;object-fit:contain">
+    <button class="close-btn" onclick="toggleMenu()">✕</button>
+  </div>
+  <ul class="mobile-nav-list">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="index.html">Politics</a></li>
+    <li><a href="index.html">Local News</a></li>
+    <li><a href="index.html">Sports</a></li>
+    <li><a href="index.html">Entertainment</a></li>
+    <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
+  </ul>
+</div>
+
+<!-- Load Supabase CDN, then our client, then article logic -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/article.js"></script>
+
+<script>
+  // Date
+  (function() {
+    var d = new Date();
+    var el = document.getElementById('current-date');
+    if (el) el.textContent = d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  })();
+
+  function toggleMenu() {
+    var m = document.getElementById('mobileMenu');
+    m.classList.toggle('open');
+    document.body.style.overflow = m.classList.contains('open') ? 'hidden' : '';
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+</script>
+</body>
+</html>
