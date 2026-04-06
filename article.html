@@ -136,6 +136,16 @@
     .sidebar-list-item:hover .sidebar-list-title { color:var(--accent); }
     .sidebar-mini-meta { font-family:var(--font-ui); font-size:10px; color:var(--text-muted); margin-top:3px; }
 
+    /* ── Prev / Next navigation ─────────────────────────── */
+    .article-nav { border-top:2px solid var(--border); margin-top:48px; padding-top:28px; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .article-nav-link { display:flex; flex-direction:column; gap:6px; padding:16px 20px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-soft); text-decoration:none; color:inherit; transition:all 0.2s; }
+    .article-nav-link:hover { background:#fff; box-shadow:var(--shadow-md); border-color:var(--border-dark); }
+    .article-nav-link.nav-next { text-align:right; }
+    .article-nav-label { font-family:var(--font-ui); font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); }
+    .article-nav-title { font-family:var(--font-display); font-size:15px; font-weight:600; line-height:1.35; color:var(--text-primary); }
+    .article-nav-link:hover .article-nav-title { color:var(--accent); }
+    .article-nav-placeholder { visibility:hidden; }
+
     /* ── Footer ─────────────────────────────────────────── */
     .footer-top { background:#0d2240; padding:48px 0 36px; border-top:3px solid var(--accent); }
     .footer-grid { display:grid; grid-template-columns:1.9fr 1fr 1fr; gap:40px; }
@@ -237,6 +247,9 @@
       <main id="article-main"><!-- filled by JS --></main>
       <aside id="article-sidebar"><!-- filled by JS --></aside>
     </div>
+
+    <!-- Prev / Next navigation -->
+    <div id="article-nav" style="display:none"></div>
 
   </div>
 </div>
