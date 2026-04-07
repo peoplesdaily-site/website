@@ -421,6 +421,14 @@
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       Site Settings
     </a>
+    <a class="dash-nav-link" onclick="showView('view-pages')" href="#">
+      <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Pages
+    </a>
+    <a class="dash-nav-link" onclick="showView('view-subscribers')" href="#">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Subscribers
+    </a>
     <a class="dash-nav-link" href="index.html">
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       View Website
@@ -669,6 +677,45 @@
           </div>
           <div class="dash-panel-body">
             <div id="settings-form-wrap"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: PAGES ══════════════════════════════ -->
+      <!-- Edit About Us, Editorial Policy, Contact Us text -->
+      <div id="view-pages" class="dash-view">
+        <div class="dash-panel">
+          <div class="dash-panel-header">
+            <span class="dash-panel-title">Edit Pages</span>
+            <span style="font-size:11px;color:var(--text-muted)">Changes appear on the website instantly</span>
+          </div>
+          <div class="dash-panel-body">
+
+            <!-- Page selector tabs -->
+            <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+              <button class="btn btn-primary btn-sm page-tab active" onclick="switchPageTab('about',this)">About Us</button>
+              <button class="btn btn-ghost btn-sm page-tab" onclick="switchPageTab('editorial-policy',this)">Editorial Policy</button>
+              <button class="btn btn-ghost btn-sm page-tab" onclick="switchPageTab('contact',this)">Contact Us</button>
+            </div>
+
+            <!-- The form — JS fills the textarea with the right content -->
+            <div id="page-editor-wrap">
+              <div class="spinner"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: SUBSCRIBERS ═════════════════════════ -->
+      <div id="view-subscribers" class="dash-view">
+        <div class="dash-panel">
+          <div class="dash-panel-header">
+            <span class="dash-panel-title">Newsletter Subscribers</span>
+            <span id="subscriber-count" style="font-size:12px;color:var(--text-muted)"></span>
+          </div>
+          <div class="dash-panel-body" style="padding:0">
+            <div id="subscribers-wrap"><div class="spinner"></div></div>
           </div>
         </div>
       </div>
