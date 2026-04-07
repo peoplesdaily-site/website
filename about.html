@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us — People's Daily News Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#1e3a5c; --accent:#c0392b; --accent-light:#e74c3c; --gold:#4a6080;
+      --bg:#ffffff; --bg-soft:#f7f7f7; --bg-mid:#f0f0f0; --border:#e0e0e0;
+      --border-dark:#cccccc; --text-primary:#111111; --text-secondary:#444444;
+      --text-muted:#777777;
+      --font-display:'Playfair Display',Georgia,serif;
+      --font-body:'Source Serif 4',Georgia,serif;
+      --font-ui:'Barlow',sans-serif;
+      --shadow-sm:0 1px 4px rgba(0,0,0,0.08); --shadow-md:0 4px 16px rgba(0,0,0,0.10);
+      --radius:3px; --nav-h:44px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none} img{display:block;max-width:100%} ul{list-style:none}
+    .container{max-width:1280px;margin:0 auto;padding:0 20px}
+
+    /* Top bar */
+    .top-bar{background:var(--primary);color:rgba(255,255,255,0.75);font-family:var(--font-ui);font-size:11.5px;border-bottom:2px solid var(--accent)}
+    .top-bar-inner{display:flex;align-items:center;justify-content:space-between;height:34px}
+
+    /* Masthead */
+    .masthead{background:var(--bg);padding:18px 0 14px;border-bottom:1px solid var(--border)}
+    .masthead-inner{display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .logo-wrap{display:flex;align-items:center;gap:14px}
+    .logo-img{height:64px;width:auto;object-fit:contain;border-radius:6px}
+    .masthead-actions{display:flex;align-items:center;gap:10px}
+    .btn{font-family:var(--font-ui);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:9px 20px;border-radius:var(--radius);cursor:pointer;border:none;display:inline-block;transition:all 0.2s}
+    .btn-primary{background:var(--accent);color:#fff} .btn-primary:hover{background:var(--accent-light)}
+    .btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)} .btn-outline:hover{background:var(--primary);color:#fff}
+
+    /* Navbar */
+    .navbar{background:var(--primary);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-md)}
+    .navbar-inner{display:flex;align-items:center;justify-content:space-between;height:var(--nav-h)}
+    .nav-list{display:flex;align-items:center;height:100%}
+    .nav-list li{height:100%}
+    .nav-list a{font-family:var(--font-ui);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:rgba(255,255,255,0.80);display:flex;align-items:center;height:100%;padding:0 14px;border-bottom:3px solid transparent;transition:color 0.2s,border-color 0.2s}
+    .nav-list a:hover{color:#fff;border-bottom-color:var(--accent)}
+    .nav-list .nav-dashboard a{color:var(--gold)}
+    .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+    .hamburger span{width:22px;height:2px;background:#fff;border-radius:2px;display:block}
+
+    /* Page content area */
+    .page-area{padding:48px 0 64px}
+    .page-inner{max-width:760px;margin:0 auto}
+    .page-breadcrumb{font-family:var(--font-ui);font-size:11px;color:var(--text-muted);margin-bottom:20px}
+    .page-breadcrumb a{color:var(--primary);font-weight:600}
+    .page-breadcrumb a:hover{text-decoration:underline}
+    .page-eyebrow{font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .page-eyebrow::before{content:'';width:4px;height:14px;background:var(--accent);border-radius:1px;display:inline-block}
+    h1#page-title{font-family:var(--font-display);font-size:40px;font-weight:800;line-height:1.2;color:var(--text-primary);margin-bottom:12px}
+    #page-updated{font-family:var(--font-ui);font-size:11px;color:var(--text-muted);margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+    #page-content p{font-family:var(--font-body);font-size:17px;line-height:1.8;color:var(--text-primary);margin-bottom:20px}
+    #page-content h3.page-subheading{font-family:var(--font-ui);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--primary);margin:32px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+    .loading-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;margin:60px auto}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Footer */
+    .footer-top{background:#0d2240;padding:48px 0 36px;border-top:3px solid var(--accent)}
+    .footer-grid{display:grid;grid-template-columns:1.9fr 1fr 1fr 1fr;gap:40px}
+    .footer-logo-img{height:56px;width:auto;object-fit:contain;border-radius:6px}
+    .footer-col h5{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#fff;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)}
+    .footer-col ul li{margin-bottom:9px}
+    .footer-col ul li a{font-family:var(--font-ui);font-size:13px;color:rgba(255,255,255,0.6);transition:color 0.2s}
+    .footer-col ul li a:hover{color:#fff}
+    .footer-bottom{background:#091a30;padding:16px 0}
+    .footer-bottom-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    .footer-copyright{font-family:var(--font-ui);font-size:11.5px;color:rgba(255,255,255,0.35)}
+    .footer-links{display:flex;gap:20px}
+    .footer-links a{font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.35);transition:color 0.2s}
+    .footer-links a:hover{color:rgba(255,255,255,0.7)}
+
+    /* Mobile menu */
+    .mobile-menu{display:none;position:fixed;inset:0;background:var(--primary);z-index:200;flex-direction:column;overflow-y:auto}
+    .mobile-menu.open{display:flex}
+    .mobile-menu-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3)}
+    .close-btn{background:none;border:none;color:#fff;font-size:26px;cursor:pointer}
+    .mobile-nav-list li a{display:block;font-family:var(--font-ui);font-size:15px;font-weight:600;color:rgba(255,255,255,0.85);padding:14px 24px;border-bottom:1px solid rgba(255,255,255,0.07)}
+    .mobile-nav-list .nav-dashboard a{color:var(--gold)}
+
+    @media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:28px}}
+    @media(max-width:700px){.nav-list{display:none}.hamburger{display:flex}.footer-grid{grid-template-columns:1fr}}
+    @media(max-width:480px){h1#page-title{font-size:28px}}
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-inner">
+      <span id="current-date"></span>
+    </div>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="container">
+    <div class="masthead-inner">
+      <a href="index.html" class="logo-wrap">
+        <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="logo-img" onerror="this.style.display='none'">
+      </a>
+      <div class="masthead-actions">
+        <a href="index.html#newsletter" class="btn btn-outline">Subscribe</a>
+        <a href="dashboard.html" class="btn btn-primary">Dashboard</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-inner">
+      <ul class="nav-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#politics">Politics</a></li>
+        <li><a href="index.html#local-news">Local News</a></li>
+        <li><a href="index.html#local-news">Crime</a></li>
+        <li><a href="index.html#business">Business</a></li>
+        <li><a href="index.html#sports">Sports</a></li>
+        <li><a href="index.html#entertainment">Entertainment</a></li>
+        <li><a href="index.html">World</a></li>
+        <li><a href="index.html#opinion">Opinion</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
+      </ul>
+      <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- Page Content -->
+<div class="page-area">
+  <div class="container">
+    <div class="page-inner">
+      <div class="page-breadcrumb">
+        <a href="index.html">Home</a> &rsaquo; About Us
+      </div>
+      <div class="page-eyebrow">People's Daily News Online</div>
+      <h1 id="page-title"><div class="loading-spinner"></div></h1>
+      <div id="page-updated"></div>
+      <div id="page-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-top">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="footer-logo-img" onerror="this.style.display='none'">
+        </div>
+        <div class="footer-col">
+          <h5>Sections</h5>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#politics">Politics</a></li>
+            <li><a href="index.html#local-news">Local News</a></li>
+            <li><a href="index.html#local-news">Crime &amp; Justice</a></li>
+            <li><a href="index.html#business">Business &amp; Economy</a></li>
+            <li><a href="index.html#sports">Sports</a></li>
+            <li><a href="index.html#entertainment">Entertainment</a></li>
+            <li><a href="index.html">World News</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="editorial-policy.html">Editorial Policy</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Subscribe</h5>
+          <ul>
+            <li><a href="index.html#newsletter">Daily Newsletter</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Enquiry%20%E2%80%94%20People%27s%20Daily%20News%20Online&body=Hello%2C%0A%0AI%20would%20like%20to%20advertise%20on%20your%20website.%20Please%20get%20in%20touch%20with%20me%20to%20discuss%20available%20advertising%20options%20and%20packages.%0A%0AThank%20you.">Advertise With Us</a></li>
+          </ul>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
+            <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
+              Have a tip?<br>
+              <a href="mailto:news@pdno.co.bw" style="color:#7ba4d4;font-weight:600">news@pdno.co.bw</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="footer-bottom-inner">
+        <span class="footer-copyright">&copy; 2026 People's Daily News Online. All rights reserved.</span>
+        <div class="footer-links">
+          <a href="about.html">Privacy Policy</a>
+          <a href="editorial-policy.html">Terms of Use</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-header">
+    <img src="images/thumbnail (6).png" alt="" style="height:36px;width:auto;object-fit:contain" onerror="this.style.display='none'">
+    <button class="close-btn" onclick="toggleMenu()">✕</button>
+  </div>
+  <ul class="mobile-nav-list">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="index.html#politics">Politics</a></li>
+    <li><a href="index.html#local-news">Local News</a></li>
+    <li><a href="index.html#business">Business</a></li>
+    <li><a href="index.html#sports">Sports</a></li>
+    <li><a href="index.html#entertainment">Entertainment</a></li>
+    <li><a href="index.html#opinion">Opinion</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
+  </ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script>var PAGE_SLUG = 'about';</script>
+<script src="js/page.js"></script>
+<script>
+  (function(){
+    var el = document.getElementById('current-date');
+    if(el) el.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  })();
+  function toggleMenu(){
+    var m=document.getElementById('mobileMenu');
+    m.classList.toggle('open');
+    document.body.style.overflow=m.classList.contains('open')?'hidden':'';
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){document.getElementById('mobileMenu').classList.remove('open');document.body.style.overflow='';}
+  });
+</script>
+</body>
+</html>
