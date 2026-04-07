@@ -107,10 +107,12 @@ function showScreen(which) {
 // ══════════════════════════════════════════════════════════
 
 const viewTitles = {
-  'view-overview':  'Overview',
-  'view-articles':  'All Articles',
-  'view-new':       'New Article',
-  'view-settings':  'Site Settings',
+  'view-overview':     'Overview',
+  'view-articles':     'All Articles',
+  'view-new':          'New Article',
+  'view-settings':     'Site Settings',
+  'view-pages':        'Edit Pages',
+  'view-subscribers':  'Newsletter Subscribers',
 };
 
 function showView(id) {
@@ -127,9 +129,11 @@ function showView(id) {
   document.getElementById('view-title').textContent = viewTitles[id] || 'Dashboard';
 
   // Lazy-load data for each view
-  if (id === 'view-overview')  loadOverview();
-  if (id === 'view-articles')  loadArticlesTable();
-  if (id === 'view-settings')  loadSettings();
+  if (id === 'view-overview')     loadOverview();
+  if (id === 'view-articles')     loadArticlesTable();
+  if (id === 'view-settings')     loadSettings();
+  if (id === 'view-pages')        loadPageEditor();
+  if (id === 'view-subscribers')  loadSubscribers();
 }
 
 // ══════════════════════════════════════════════════════════
@@ -796,4 +800,208 @@ async function saveHeroOrder() {
     if (newOrder !== -1) return { ...a, display_order: newOrder + 1 };
     return a;
   });
+}
+
+
+// ══════════════════════════════════════════════════════════
+// PAGES EDITOR
+// ══════════════════════════════════════════════════════════
+
+// Which page slug is currently loaded in the editor
+let currentPageSlug = 'about';
+
+/** Called when a user clicks one of the About/Editorial/Contact tabs */
+function switchPageTab(slug, btn) {
+  // Update active tab button style
+  document.querySelectorAll('.page-tab').forEach(b => {
+    b.className = b === btn ? 'btn btn-primary btn-sm page-tab active' : 'btn btn-ghost btn-sm page-tab';
+  });
+  currentPageSlug = slug;
+  loadPageEditor();
+}
+
+/** Fetch a page from Supabase and render the simple edit form */
+async function loadPageEditor() {
+  const wrap = document.getElementById('page-editor-wrap');
+  wrap.innerHTML = '<div class="spinner"></div>';
+
+  const { data: page, error } = await _supabase
+    .from('pages')
+    .select('*')
+    .eq('slug', currentPageSlug)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    // PGRST116 = no rows — page doesn't exist yet, that's fine
+    wrap.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Error loading page: ' + error.message + '</p>';
+    return;
+  }
+
+  const p = page || {};
+
+  wrap.innerHTML = `
+    <input type="hidden" id="page-id" value="${escHtml(p.id || '')}">
+
+    <div class="form-row full" style="margin-bottom:14px">
+      <div class="form-group">
+        <label>Page Title</label>
+        <input type="text" id="page-title-input" value="${escHtml(p.title || '')}"
+               placeholder="e.g. About Us">
+        <span class="form-hint">This shows as the heading on the page.</span>
+      </div>
+    </div>
+
+    <div class="form-row full" style="margin-bottom:20px">
+      <div class="form-group">
+        <label>Page Content</label>
+        <textarea id="page-content-input" style="min-height:360px;resize:vertical;font-size:13px;line-height:1.7"
+                  placeholder="Write the page content here.
+
+Use a blank line between paragraphs.
+
+SHORT ALL-CAPS LINES BECOME SECTION HEADINGS — for example:
+
+OUR MISSION
+This is the mission text here.
+
+CONTACT
+Reach us at news@pdno.co.bw">${escHtml(p.content || '')}</textarea>
+        <span class="form-hint">
+          ✏️ <strong>Tip:</strong> Separate paragraphs with a blank line.
+          Short ALL-CAPS lines (like OUR STORY) automatically become bold headings on the page.
+        </span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="savePage()">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Page
+      </button>
+      <a href="${currentPageSlug === 'about' ? 'about.html' : currentPageSlug === 'contact' ? 'contact.html' : 'editorial-policy.html'}"
+         target="_blank" class="btn btn-ghost">
+        Preview →
+      </a>
+    </div>
+
+    <div id="page-save-msg" style="margin-top:10px;font-size:12px;font-family:var(--font-ui);min-height:16px"></div>
+  `;
+}
+
+/** Save the page content to Supabase */
+async function savePage() {
+  const existingId = document.getElementById('page-id').value;
+  const title   = document.getElementById('page-title-input').value.trim();
+  const content = document.getElementById('page-content-input').value.trim();
+  const msgEl   = document.getElementById('page-save-msg');
+
+  if (!title) {
+    msgEl.innerHTML = '<span style="color:var(--accent)">Page title is required.</span>';
+    return;
+  }
+
+  const payload = {
+    slug:       currentPageSlug,
+    title,
+    content,
+    updated_at: new Date().toISOString(),
+  };
+
+  let error;
+  if (existingId) {
+    // Update
+    const res = await _supabase.from('pages').update(payload).eq('id', existingId);
+    error = res.error;
+  } else {
+    // Insert (page didn't exist yet)
+    const res = await _supabase.from('pages').insert([payload]);
+    error = res.error;
+  }
+
+  if (error) {
+    msgEl.innerHTML = '<span style="color:var(--accent)">Save failed: ' + error.message + '</span>';
+    toast('Save failed: ' + error.message, 'error');
+    return;
+  }
+
+  msgEl.innerHTML = '<span style="color:var(--green)">✓ Page saved! Changes are live on the website.</span>';
+  toast('Page saved!', 'success');
+
+  // Reload so the hidden ID gets populated if it was a new insert
+  setTimeout(loadPageEditor, 800);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// NEWSLETTER SUBSCRIBERS
+// ══════════════════════════════════════════════════════════
+
+async function loadSubscribers() {
+  const wrap    = document.getElementById('subscribers-wrap');
+  const countEl = document.getElementById('subscriber-count');
+  wrap.innerHTML = '<div class="spinner"></div>';
+
+  const { data, error } = await _supabase
+    .from('newsletter_subscribers')
+    .select('*')
+    .order('subscribed_at', { ascending: false });
+
+  if (error) {
+    wrap.innerHTML = '<p style="padding:20px;color:var(--text-muted)">Error loading subscribers: ' + error.message + '</p>';
+    return;
+  }
+
+  const subs = data || [];
+  if (countEl) countEl.textContent = subs.length + ' subscriber' + (subs.length !== 1 ? 's' : '');
+
+  if (subs.length === 0) {
+    wrap.innerHTML = '<p style="padding:28px;color:var(--text-muted);font-size:13px;font-family:var(--font-ui)">No subscribers yet. They will appear here once readers sign up via the newsletter widget on the homepage.</p>';
+    return;
+  }
+
+  wrap.innerHTML = `
+    <table class="articles-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Email Address</th>
+          <th>Subscribed</th>
+          <th style="width:100px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${subs.map((s, i) => `
+          <tr>
+            <td style="color:var(--text-muted);font-family:var(--font-ui);font-size:12px">${i + 1}</td>
+            <td style="font-family:var(--font-ui);font-size:13px;font-weight:500">${escHtml(s.email)}</td>
+            <td style="font-family:var(--font-ui);font-size:12px;color:var(--text-muted);white-space:nowrap">
+              ${s.subscribed_at ? new Date(s.subscribed_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—'}
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="deleteSubscriber('${s.id}', '${escHtml(s.email)}')">
+                Remove
+              </button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    <div style="padding:12px 16px;background:var(--bg-soft);border-top:1px solid var(--border);font-family:var(--font-ui);font-size:11px;color:var(--text-muted)">
+      ${subs.length} total subscriber${subs.length !== 1 ? 's' : ''}.
+      You can copy these emails into your mailing list tool (Mailchimp, Brevo, etc.).
+    </div>
+  `;
+}
+
+async function deleteSubscriber(id, email) {
+  if (!confirm('Remove ' + email + ' from the subscriber list?')) return;
+
+  const { error } = await _supabase
+    .from('newsletter_subscribers')
+    .delete()
+    .eq('id', id);
+
+  if (error) { toast('Could not remove: ' + error.message, 'error'); return; }
+  toast('Subscriber removed.', 'success');
+  loadSubscribers();
 }
