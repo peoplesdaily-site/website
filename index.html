@@ -346,9 +346,8 @@
         <button class="search-btn" onclick="toggleSearch()" aria-label="Search">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </button>
-        <a href="signin.html" class="btn btn-outline js-signin-link" style="display:inline-block">Sign In</a>
-        <a href="dashboard.html" class="btn btn-outline" id="admin-dashboard-btn" style="display:none">Dashboard</a>
-        <a href="#" class="btn btn-primary" style="display:inline-block">Subscribe</a>
+        <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Sign In</a>
+        <a href="#newsletter" class="btn btn-primary" style="display:inline-block">Subscribe</a>
       </div>
     </div>
   </div>
@@ -360,15 +359,15 @@
     <div class="navbar-inner">
       <ul class="nav-list">
         <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="index.html">Politics</a></li>
-        <li><a href="index.html">Local News</a></li>
-        <li><a href="index.html">Crime</a></li>
-        <li><a href="index.html">Business</a></li>
-        <li><a href="index.html">Sports</a></li>
-        <li><a href="index.html">Entertainment</a></li>
-        <li><a href="index.html">World</a></li>
-        <li><a href="index.html">Opinion</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="#politics">Politics</a></li>
+        <li><a href="#local-news">Local News</a></li>
+        <li><a href="#local-news">Crime</a></li>
+        <li><a href="#business">Business</a></li>
+        <li><a href="#sports">Sports</a></li>
+        <li><a href="#entertainment">Entertainment</a></li>
+        <li><a href="#home">World</a></li>
+        <li><a href="#opinion">Opinion</a></li>
+        <li><a href="contact.html">Contact</a></li>
         
       </ul>
       <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
@@ -387,7 +386,7 @@
            onerror="this.parentElement.innerHTML='<div style=\'font-family:var(--font-ui);font-size:13px;color:var(--text-muted);padding:20px 0;\'>📢 <strong>Advertise With Us</strong> — Reach thousands of daily readers.</div>'">
     </div>
     <div class="ad-cta-wrap">
-      <a href="#" class="ad-cta">Advertise With Us</a>
+      <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Enquiry%20%E2%80%94%20People%27s%20Daily%20News%20Online&body=Hello%2C%0A%0AI%20would%20like%20to%20advertise%20on%20your%20website.%20Please%20get%20in%20touch%20with%20me%20to%20discuss%20available%20advertising%20options%20and%20packages.%0A%0AThank%20you." class="ad-cta">Advertise With Us</a>
     </div>
   </div>
 </div>
@@ -398,7 +397,7 @@
      Falls back to placeholder content if
      no articles are fetched.
 ════════════════════════════════════════════ -->
-<section class="hero">
+<section class="hero" id="home">
   <div class="container">
     <!-- main.js writes into this element -->
     <div class="hero-grid" id="hero-grid">
@@ -437,7 +436,7 @@
       <main>
 
         <!-- LOCAL NEWS — id="local-news-grid" filled by main.js -->
-        <section class="news-section">
+        <section class="news-section" id="local-news">
           <div class="section-label accent">Local News</div>
           <div class="news-grid-3" id="local-news-grid">
             <!-- Placeholders -->
@@ -448,7 +447,7 @@
         </section>
 
         <!-- POLITICS — politics-main + politics-list filled by main.js -->
-        <section class="news-section">
+        <section class="news-section" id="politics">
           <div class="section-label accent">Politics</div>
           <div class="news-grid-featured">
             <div id="politics-main">
@@ -471,12 +470,12 @@
                onerror="this.outerHTML='<div style=\'background:linear-gradient(135deg,#1a1a2e,#2c2c4e);border-radius:4px;padding:28px;\'><p style=\'font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;\'>Reach 50,000+ Daily Readers</p></div>'">
           <div class="ad-mid-cta">
             <p>Premium placements available · <strong>Contact our advertising team today</strong></p>
-            <a href="#" class="ad-cta">Get In Touch</a>
+            <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Enquiry%20%E2%80%94%20People%27s%20Daily%20News%20Online&body=Hello%2C%0A%0AI%20would%20like%20to%20advertise%20on%20your%20website.%20Please%20get%20in%20touch%20with%20me%20to%20discuss%20available%20advertising%20options%20and%20packages.%0A%0AThank%20you." class="ad-cta">Get In Touch</a>
           </div>
         </div>
 
         <!-- BUSINESS — id="business-grid" filled by main.js -->
-        <section class="news-section">
+        <section class="news-section" id="business">
           <div class="section-label accent">Business &amp; Economy</div>
           <div class="news-grid-2" id="business-grid">
             <article class="news-card"><div class="img-placeholder" style="height:200px"></div><div class="news-card-body"><h3 class="news-card-title">Loading…</h3></div></article>
@@ -509,11 +508,12 @@
           </div>
         </div>
 
-        <div class="newsletter-box">
+        <div class="newsletter-box" id="newsletter">
           <h4>Stay Informed Daily</h4>
           <p>Get the top stories delivered to your inbox every morning. Free, no spam.</p>
-          <input class="newsletter-input" type="email" placeholder="Your email address">
-          <button class="newsletter-btn">Subscribe Free</button>
+          <input class="newsletter-input" type="email" id="newsletter-email" placeholder="Your email address">
+          <button class="newsletter-btn" onclick="subscribeNewsletter()">Subscribe Free</button>
+          <div id="newsletter-msg" style="font-size:11px;margin-top:6px;font-family:var(--font-ui);min-height:16px"></div>
         </div>
 
         <div class="sidebar-widget">
@@ -544,7 +544,7 @@
 </div>
 
 <!-- OPINION SECTION (static — can be made dynamic similarly) -->
-<section class="opinion-section">
+<section class="opinion-section" id="opinion">
   <div class="container">
     <div class="section-label accent">Opinion &amp; Analysis</div>
     <div class="opinion-grid">
@@ -571,7 +571,7 @@
 </section>
 
 <!-- SPORTS — id="sports-grid" filled by main.js -->
-<section class="sports-strip">
+<section class="sports-strip" id="sports">
   <div class="container">
     <div class="section-label accent" style="color:rgba(255,255,255,0.5)">Sports</div>
     <div class="sports-grid" id="sports-grid">
@@ -585,7 +585,7 @@
 </section>
 
 <!-- ENTERTAINMENT — id="entertainment-grid" filled by main.js -->
-<div class="content-area" style="padding-top:4px">
+<div class="content-area" id="entertainment" style="padding-top:4px">
   <div class="container">
     <div class="section-label accent">Entertainment &amp; Culture</div>
     <div class="news-grid-3" id="entertainment-grid" style="margin-bottom:40px">
@@ -609,31 +609,29 @@
           <h5>Sections</h5>
           <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="index.html">Politics</a></li>
-            <li><a href="index.html">Local News</a></li>
-            <li><a href="index.html">Crime &amp; Justice</a></li>
-            <li><a href="index.html">Business &amp; Economy</a></li>
-            <li><a href="index.html">Sports</a></li>
-            <li><a href="index.html">Entertainment</a></li>
-            <li><a href="index.html">World News</a></li>
+            <li><a href="#politics">Politics</a></li>
+            <li><a href="#local-news">Local News</a></li>
+            <li><a href="#local-news">Crime &amp; Justice</a></li>
+            <li><a href="#business">Business &amp; Economy</a></li>
+            <li><a href="#sports">Sports</a></li>
+            <li><a href="#entertainment">Entertainment</a></li>
+            <li><a href="#home">World News</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h5>Company</h5>
           <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Editorial Policy</a></li>
-            <li><a href="#">Advertise With Us</a></li>
-            <li><a href="#">Contact Us</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="editorial-policy.html">Editorial Policy</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
             
           </ul>
         </div>
         <div class="footer-col">
           <h5>Subscribe</h5>
           <ul>
-            <li><a href="#">Daily Newsletter</a></li>
-            <li><a href="#">Breaking News Alerts</a></li>
-            <li><a href="#">RSS Feed</a></li>
+            <li><a href="#newsletter">Daily Newsletter</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Enquiry%20%E2%80%94%20People%27s%20Daily%20News%20Online&body=Hello%2C%0A%0AI%20would%20like%20to%20advertise%20on%20your%20website.%20Please%20get%20in%20touch%20with%20me%20to%20discuss%20available%20advertising%20options%20and%20packages.%0A%0AThank%20you.">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
@@ -650,9 +648,9 @@
       <div class="footer-bottom-inner">
         <span class="footer-copyright">&copy; 2026 People's Daily News Online. All rights reserved.</span>
         <div class="footer-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Use</a>
-          <a href="#">Corrections</a>
+          <a href="about.html">Privacy Policy</a>
+          <a href="editorial-policy.html">Terms of Use</a>
+          <a href="contact.html">Corrections</a>
         </div>
       </div>
     </div>
@@ -667,20 +665,19 @@
   </div>
   <ul class="mobile-nav-list">
     <li><a href="index.html">Home</a></li>
-    <li><a href="index.html">Politics</a></li>
-    <li><a href="index.html">Local News</a></li>
-    <li><a href="index.html">Crime</a></li>
-    <li><a href="index.html">Business</a></li>
-    <li><a href="index.html">Sports</a></li>
-    <li><a href="index.html">Entertainment</a></li>
-    <li><a href="index.html">World</a></li>
-    <li><a href="index.html">Opinion</a></li>
-    <li><a href="#">Contact</a></li>
+    <li><a href="#politics">Politics</a></li>
+    <li><a href="#local-news">Local News</a></li>
+    <li><a href="#local-news">Crime</a></li>
+    <li><a href="#business">Business</a></li>
+    <li><a href="#sports">Sports</a></li>
+    <li><a href="#entertainment">Entertainment</a></li>
+    <li><a href="#home">World</a></li>
+    <li><a href="#opinion">Opinion</a></li>
+    <li><a href="contact.html">Contact</a></li>
     
     <li style="padding:20px 24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:10px">
-      <a href="signin.html" class="btn btn-outline btn-ghost js-signin-link">Sign In</a>
-      <a href="dashboard.html" class="btn btn-outline btn-ghost" id="mobile-admin-dashboard-btn" style="display:none">Dashboard</a>
-      <a href="#" class="btn btn-primary">Subscribe</a>
+      <a href="dashboard.html" class="btn btn-outline btn-ghost">Sign In</a>
+      <a href="#newsletter" class="btn btn-primary">Subscribe</a>
     </li>
   </ul>
 </div>
@@ -745,6 +742,48 @@
       ? '0 4px 20px rgba(0,0,0,0.22)'
       : '0 4px 16px rgba(0,0,0,0.10)';
   });
+
+  // ── Newsletter subscription ──────────────────────────────
+  // Inserts the email into the newsletter_subscribers Supabase table.
+  // _supabase is available because supabase-client.js loaded above.
+  async function subscribeNewsletter() {
+    var input   = document.getElementById('newsletter-email');
+    var msgEl   = document.getElementById('newsletter-msg');
+    var btn     = document.querySelector('.newsletter-btn');
+    var email   = input.value.trim();
+
+    if (!email || email.indexOf('@') === -1) {
+      msgEl.innerHTML = '<span style="color:#e74c3c">Please enter a valid email address.</span>';
+      return;
+    }
+
+    btn.textContent = 'Subscribing…';
+    btn.disabled = true;
+
+    var result = await _supabase
+      .from('newsletter_subscribers')
+      .insert([{ email: email }]);
+
+    btn.textContent = 'Subscribe Free';
+    btn.disabled = false;
+
+    if (result.error) {
+      if (result.error.code === '23505') {
+        // Unique violation — already subscribed
+        msgEl.innerHTML = '<span style="color:#27ae60">✓ You're already subscribed!</span>';
+      } else {
+        msgEl.innerHTML = '<span style="color:#e74c3c">Something went wrong. Please try again.</span>';
+      }
+    } else {
+      msgEl.innerHTML = '<span style="color:#27ae60">✓ Subscribed! Thank you for joining.</span>';
+      input.value = '';
+    }
+  }
+
+  // Allow pressing Enter in newsletter input
+  document.getElementById('newsletter-email').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') subscribeNewsletter();
+  });
 </script>
 
 
@@ -791,14 +830,4 @@
 
     if (typeof _supabase !== 'undefined') {
       syncAuthUI();
-      _supabase.auth.onAuthStateChange(function (_event, session) {
-        var user = session ? session.user : null;
-        wireSignInLinks(user);
-        setAdminDashboardVisible(!!(user && user.email === ADMIN_EMAIL));
-      });
-    }
-  })();
-</script>
-
-</body>
-</html>
+      _supabase.auth.onAuthStateChange(
