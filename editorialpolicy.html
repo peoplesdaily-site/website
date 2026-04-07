@@ -91,6 +91,19 @@
     @media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:28px}}
     @media(max-width:700px){.nav-list{display:none}.hamburger{display:flex}.footer-grid{grid-template-columns:1fr}}
     @media(max-width:480px){h1#page-title{font-size:28px}}
+    const ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
+function updateAuthUI(user) {
+  var btn = document.getElementById('auth-nav-btn');
+  if (!btn) return;
+  if (!user) { btn.textContent = 'Sign In'; btn.href = 'signin.html'; }
+  else if (user.email === ADMIN_EMAIL) { btn.textContent = 'Dashboard'; btn.href = 'dashboard.html'; }
+  else {
+    btn.textContent = 'Sign Out'; btn.href = '#';
+    btn.onclick = function(e){ e.preventDefault(); _supabase.auth.signOut().then(function(){ location.reload(); }); };
+  }
+}
+_supabase.auth.getSession().then(function(r){ updateAuthUI(r.data&&r.data.session?r.data.session.user:null); });
+_supabase.auth.onAuthStateChange(function(_e,s){ updateAuthUI(s?s.user:null); });
   </style>
 </head>
 <body>
