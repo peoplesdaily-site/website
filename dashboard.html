@@ -422,8 +422,8 @@
       Site Settings
     </a>
     <a class="dash-nav-link" onclick="showView('view-pages')" href="#">
-      <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      Pages
+      <svg viewBox="0 0 24 24" style="stroke-linecap:round;stroke-linejoin:round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit Pages
     </a>
     <a class="dash-nav-link" onclick="showView('view-subscribers')" href="#">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
@@ -681,33 +681,31 @@
         </div>
       </div>
 
-      <!-- ══ VIEW: PAGES ══════════════════════════════ -->
-      <!-- Edit About Us, Editorial Policy, Contact Us text -->
+      <!-- ══ VIEW: EDIT PAGES ══════════════════════════ -->
+      <!-- Allows admin to edit About Us, Editorial Policy, Contact Us -->
       <div id="view-pages" class="dash-view">
         <div class="dash-panel">
           <div class="dash-panel-header">
             <span class="dash-panel-title">Edit Pages</span>
-            <span style="font-size:11px;color:var(--text-muted)">Changes appear on the website instantly</span>
+            <span style="font-size:11px;color:var(--text-muted)">Changes go live on the website instantly</span>
           </div>
           <div class="dash-panel-body">
-
-            <!-- Page selector tabs -->
+            <!-- Tab selector -->
             <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-              <button class="btn btn-primary btn-sm page-tab active" onclick="switchPageTab('about',this)">About Us</button>
-              <button class="btn btn-ghost btn-sm page-tab" onclick="switchPageTab('editorial-policy',this)">Editorial Policy</button>
-              <button class="btn btn-ghost btn-sm page-tab" onclick="switchPageTab('contact',this)">Contact Us</button>
+              <button class="btn btn-primary btn-sm page-tab active"
+                      onclick="switchPageTab('about',this)">About Us</button>
+              <button class="btn btn-ghost btn-sm page-tab"
+                      onclick="switchPageTab('editorial-policy',this)">Editorial Policy</button>
+              <button class="btn btn-ghost btn-sm page-tab"
+                      onclick="switchPageTab('contact',this)">Contact Us</button>
             </div>
-
-            <!-- The form — JS fills the textarea with the right content -->
-            <div id="page-editor-wrap">
-              <div class="spinner"></div>
-            </div>
-
+            <!-- Editor filled by JS -->
+            <div id="page-editor-wrap"><div class="spinner"></div></div>
           </div>
         </div>
       </div>
 
-      <!-- ══ VIEW: SUBSCRIBERS ═════════════════════════ -->
+      <!-- ══ VIEW: NEWSLETTER SUBSCRIBERS ══════════════ -->
       <div id="view-subscribers" class="dash-view">
         <div class="dash-panel">
           <div class="dash-panel-header">
