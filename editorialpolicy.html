@@ -10,13 +10,14 @@
   <style>
     :root {
       --primary:#1e3a5c; --accent:#c0392b; --accent-light:#e74c3c; --gold:#4a6080;
-      --bg:#ffffff; --bg-soft:#f7f7f7; --bg-mid:#f0f0f0; --border:#e0e0e0;
-      --border-dark:#cccccc; --text-primary:#111111; --text-secondary:#444444;
-      --text-muted:#777777;
+      --bg:#ffffff; --bg-soft:#f7f7f7; --bg-mid:#f0f0f0;
+      --border:#e0e0e0; --border-dark:#cccccc;
+      --text-primary:#111111; --text-secondary:#444444; --text-muted:#777777;
       --font-display:'Playfair Display',Georgia,serif;
       --font-body:'Source Serif 4',Georgia,serif;
       --font-ui:'Barlow',sans-serif;
-      --shadow-sm:0 1px 4px rgba(0,0,0,0.08); --shadow-md:0 4px 16px rgba(0,0,0,0.10);
+      --shadow-sm:0 1px 4px rgba(0,0,0,0.08);
+      --shadow-md:0 4px 16px rgba(0,0,0,0.10);
       --radius:3px; --nav-h:44px;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -25,21 +26,28 @@
     a{color:inherit;text-decoration:none} img{display:block;max-width:100%} ul{list-style:none}
     .container{max-width:1280px;margin:0 auto;padding:0 20px}
 
-    /* Top bar */
+    /* ── Top bar ── */
     .top-bar{background:var(--primary);color:rgba(255,255,255,0.75);font-family:var(--font-ui);font-size:11.5px;border-bottom:2px solid var(--accent)}
     .top-bar-inner{display:flex;align-items:center;justify-content:space-between;height:34px}
+    .top-bar-social{display:flex;align-items:center;gap:12px}
+    .top-bar-social a{color:rgba(255,255,255,0.6);transition:color 0.2s}
+    .top-bar-social a:hover{color:#fff}
+    .top-bar-social svg{width:14px;height:14px;fill:currentColor}
 
-    /* Masthead */
+    /* ── Masthead ── */
     .masthead{background:var(--bg);padding:18px 0 14px;border-bottom:1px solid var(--border)}
     .masthead-inner{display:flex;align-items:center;justify-content:space-between;gap:24px}
     .logo-wrap{display:flex;align-items:center;gap:14px}
     .logo-img{height:64px;width:auto;object-fit:contain;border-radius:6px}
+    .logo-fallback{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--primary)}
+    .logo-fallback em{color:var(--accent);font-style:normal}
     .masthead-actions{display:flex;align-items:center;gap:10px}
     .btn{font-family:var(--font-ui);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:9px 20px;border-radius:var(--radius);cursor:pointer;border:none;display:inline-block;transition:all 0.2s}
     .btn-primary{background:var(--accent);color:#fff} .btn-primary:hover{background:var(--accent-light)}
     .btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)} .btn-outline:hover{background:var(--primary);color:#fff}
+    .btn-ghost{background:transparent;color:rgba(255,255,255,0.85);border:1.5px solid rgba(255,255,255,0.4)}
 
-    /* Navbar */
+    /* ── Navbar ── */
     .navbar{background:var(--primary);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-md)}
     .navbar-inner{display:flex;align-items:center;justify-content:space-between;height:var(--nav-h)}
     .nav-list{display:flex;align-items:center;height:100%}
@@ -47,28 +55,29 @@
     .nav-list a{font-family:var(--font-ui);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:rgba(255,255,255,0.80);display:flex;align-items:center;height:100%;padding:0 14px;border-bottom:3px solid transparent;transition:color 0.2s,border-color 0.2s}
     .nav-list a:hover{color:#fff;border-bottom-color:var(--accent)}
     .nav-list .nav-dashboard a{color:var(--gold)}
+    .nav-list .nav-dashboard a:hover{color:#fff;border-bottom-color:var(--gold)}
     .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
     .hamburger span{width:22px;height:2px;background:#fff;border-radius:2px;display:block}
 
-    /* Page content area */
-    .page-area{padding:48px 0 64px}
+    /* ── Page content ── */
+    .page-area{padding:48px 0 72px}
     .page-inner{max-width:760px;margin:0 auto}
     .page-breadcrumb{font-family:var(--font-ui);font-size:11px;color:var(--text-muted);margin-bottom:20px}
     .page-breadcrumb a{color:var(--primary);font-weight:600}
     .page-breadcrumb a:hover{text-decoration:underline}
     .page-eyebrow{font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px}
     .page-eyebrow::before{content:'';width:4px;height:14px;background:var(--accent);border-radius:1px;display:inline-block}
-    h1#page-title{font-family:var(--font-display);font-size:40px;font-weight:800;line-height:1.2;color:var(--text-primary);margin-bottom:12px}
+    h1#page-title{font-family:var(--font-display);font-size:40px;font-weight:800;line-height:1.2;color:var(--text-primary);margin-bottom:12px;min-height:52px}
     #page-updated{font-family:var(--font-ui);font-size:11px;color:var(--text-muted);margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border)}
-    #page-content p{font-family:var(--font-body);font-size:17px;line-height:1.8;color:var(--text-primary);margin-bottom:20px}
+    #page-content p{font-family:var(--font-body);font-size:17px;line-height:1.82;color:var(--text-primary);margin-bottom:20px}
     #page-content h3.page-subheading{font-family:var(--font-ui);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--primary);margin:32px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
-    .loading-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;margin:60px auto}
+    .loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 0 12px}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* Footer */
+    /* ── Footer ── */
     .footer-top{background:#0d2240;padding:48px 0 36px;border-top:3px solid var(--accent)}
     .footer-grid{display:grid;grid-template-columns:1.9fr 1fr 1fr 1fr;gap:40px}
-    .footer-logo-img{height:56px;width:auto;object-fit:contain;border-radius:6px}
+    .footer-logo-img{height:56px;width:auto;object-fit:contain;border-radius:6px;margin-bottom:12px}
     .footer-col h5{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#fff;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)}
     .footer-col ul li{margin-bottom:9px}
     .footer-col ul li a{font-family:var(--font-ui);font-size:13px;color:rgba(255,255,255,0.6);transition:color 0.2s}
@@ -80,56 +89,53 @@
     .footer-links a{font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.35);transition:color 0.2s}
     .footer-links a:hover{color:rgba(255,255,255,0.7)}
 
-    /* Mobile menu */
+    /* ── Mobile menu ── */
     .mobile-menu{display:none;position:fixed;inset:0;background:var(--primary);z-index:200;flex-direction:column;overflow-y:auto}
     .mobile-menu.open{display:flex}
     .mobile-menu-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3)}
-    .close-btn{background:none;border:none;color:#fff;font-size:26px;cursor:pointer}
-    .mobile-nav-list li a{display:block;font-family:var(--font-ui);font-size:15px;font-weight:600;color:rgba(255,255,255,0.85);padding:14px 24px;border-bottom:1px solid rgba(255,255,255,0.07)}
+    .close-btn{background:none;border:none;color:#fff;font-size:26px;cursor:pointer;line-height:1;padding:0 4px}
+    .mobile-nav-list li a{display:block;font-family:var(--font-ui);font-size:15px;font-weight:600;color:rgba(255,255,255,0.85);padding:14px 24px;border-bottom:1px solid rgba(255,255,255,0.07);transition:background 0.2s}
+    .mobile-nav-list li a:hover{background:rgba(255,255,255,0.07);color:#fff}
     .mobile-nav-list .nav-dashboard a{color:var(--gold)}
+    .mobile-menu-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:10px;flex-wrap:wrap}
 
     @media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:28px}}
     @media(max-width:700px){.nav-list{display:none}.hamburger{display:flex}.footer-grid{grid-template-columns:1fr}}
     @media(max-width:480px){h1#page-title{font-size:28px}}
-    const ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
-function updateAuthUI(user) {
-  var btn = document.getElementById('auth-nav-btn');
-  if (!btn) return;
-  if (!user) { btn.textContent = 'Sign In'; btn.href = 'signin.html'; }
-  else if (user.email === ADMIN_EMAIL) { btn.textContent = 'Dashboard'; btn.href = 'dashboard.html'; }
-  else {
-    btn.textContent = 'Sign Out'; btn.href = '#';
-    btn.onclick = function(e){ e.preventDefault(); _supabase.auth.signOut().then(function(){ location.reload(); }); };
-  }
-}
-_supabase.auth.getSession().then(function(r){ updateAuthUI(r.data&&r.data.session?r.data.session.user:null); });
-_supabase.auth.onAuthStateChange(function(_e,s){ updateAuthUI(s?s.user:null); });
   </style>
 </head>
 <body>
 
+<!-- Top bar -->
 <div class="top-bar">
   <div class="container">
     <div class="top-bar-inner">
       <span id="current-date"></span>
+      <div class="top-bar-social">
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+        </a>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- Masthead -->
 <header class="masthead">
   <div class="container">
     <div class="masthead-inner">
       <a href="index.html" class="logo-wrap">
-        <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="logo-img" onerror="this.style.display='none'">
+        <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="logo-img"
+             onerror="this.outerHTML='<span class=\'logo-fallback\'>People\'s <em>Daily</em></span>'">
       </a>
       <div class="masthead-actions">
         <a href="index.html#newsletter" class="btn btn-outline">Subscribe</a>
-        <a href="signin.html" class="btn btn-primary" id="auth-nav-btn">Sign In</a>
       </div>
     </div>
   </div>
 </header>
 
+<!-- Navbar -->
 <nav class="navbar">
   <div class="container">
     <div class="navbar-inner">
@@ -146,7 +152,9 @@ _supabase.auth.onAuthStateChange(function(_e,s){ updateAuthUI(s?s.user:null); })
         <li><a href="contact.html">Contact</a></li>
         <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
       </ul>
-      <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+      <button class="hamburger" id="hamburger-btn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
@@ -156,10 +164,10 @@ _supabase.auth.onAuthStateChange(function(_e,s){ updateAuthUI(s?s.user:null); })
   <div class="container">
     <div class="page-inner">
       <div class="page-breadcrumb">
-
+        <a href="index.html">Home</a> &rsaquo; Editorial Policy
       </div>
       <div class="page-eyebrow">People's Daily News Online</div>
-      <h1 id="page-title"><div class="loading-spinner"></div></h1>
+      <h1 id="page-title"></h1>
       <div id="page-updated"></div>
       <div id="page-content"></div>
     </div>
@@ -172,7 +180,8 @@ _supabase.auth.onAuthStateChange(function(_e,s){ updateAuthUI(s?s.user:null); })
     <div class="container">
       <div class="footer-grid">
         <div>
-          <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="footer-logo-img" onerror="this.style.display='none'">
+          <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="footer-logo-img"
+               onerror="this.style.display='none'">
         </div>
         <div class="footer-col">
           <h5>Sections</h5>
@@ -228,38 +237,65 @@ _supabase.auth.onAuthStateChange(function(_e,s){ updateAuthUI(s?s.user:null); })
 <!-- Mobile menu -->
 <div class="mobile-menu" id="mobileMenu">
   <div class="mobile-menu-header">
-    <img src="images/thumbnail (6).png" alt="" style="height:36px;width:auto;object-fit:contain" onerror="this.style.display='none'">
-    <button class="close-btn" onclick="toggleMenu()">✕</button>
+    <img src="images/thumbnail (6).png" alt="PDNO"
+         style="height:36px;width:auto;object-fit:contain"
+         onerror="this.style.display='none'">
+    <button class="close-btn" id="close-menu-btn" aria-label="Close menu">&#x2715;</button>
   </div>
   <ul class="mobile-nav-list">
     <li><a href="index.html">Home</a></li>
     <li><a href="index.html#politics">Politics</a></li>
     <li><a href="index.html#local-news">Local News</a></li>
+    <li><a href="index.html#local-news">Crime</a></li>
     <li><a href="index.html#business">Business</a></li>
     <li><a href="index.html#sports">Sports</a></li>
     <li><a href="index.html#entertainment">Entertainment</a></li>
+    <li><a href="index.html">World</a></li>
     <li><a href="index.html#opinion">Opinion</a></li>
     <li><a href="contact.html">Contact</a></li>
     <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
   </ul>
+  <div class="mobile-menu-footer">
+    <a href="index.html#newsletter" class="btn btn-primary">Subscribe Free</a>
+  </div>
 </div>
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script>var PAGE_SLUG = 'editorial-policy';</script>
 <script src="js/page.js"></script>
+
 <script>
-  (function(){
+  // ── Date ──────────────────────────────────────────────────
+  (function() {
     var el = document.getElementById('current-date');
-    if(el) el.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    if (el) el.textContent = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
   })();
-  function toggleMenu(){
-    var m=document.getElementById('mobileMenu');
-    m.classList.toggle('open');
-    document.body.style.overflow=m.classList.contains('open')?'hidden':'';
-  }
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){document.getElementById('mobileMenu').classList.remove('open');document.body.style.overflow='';}
+
+  // ── Mobile menu ───────────────────────────────────────────
+  // Bind to button elements directly so onclick works on all devices
+  document.getElementById('hamburger-btn').addEventListener('click', function() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+  document.getElementById('close-menu-btn').addEventListener('click', function() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow = '';
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // ── Sticky nav shadow ─────────────────────────────────────
+  window.addEventListener('scroll', function() {
+    document.querySelector('.navbar').style.boxShadow =
+      window.scrollY > 10 ? '0 4px 20px rgba(0,0,0,0.22)' : '0 4px 16px rgba(0,0,0,0.10)';
   });
 </script>
 </body>
