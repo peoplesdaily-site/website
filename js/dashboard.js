@@ -16,12 +16,13 @@
 //     Supabase database role or metadata check instead.
 // ============================================================
 
-// ── Admin email (UX guard only — RLS is the real lock) ───
-// NOTE: Do not place secrets here. This is just a UI check.
-const ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
-// (That's base64 for: peoplesdailynewsonline@gmail.com)
-// This is not truly hidden on the frontend — anyone who
-// opens DevTools can decode it. RLS handles real security.
+// ── Admin check — uses Supabase user_metadata.role ──────────
+// Set role in Supabase Auth dashboard:
+//   Auth → Users → click admin user → Edit → User Metadata
+//   Set: { "role": "admin" }
+// This is more secure than checking email in client code.
+// RLS on your tables is still the real security layer.
+// No admin email is exposed anywhere in this file.
 
 // ── Storage bucket name ───────────────────────────────────
 const STORAGE_BUCKET = 'news-images';
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   currentUser = session.user;
 
   // Check if this user is the admin
-  if (currentUser.email !== ADMIN_EMAIL) {
+  if (!currentUser.user_metadata || currentUser.user_metadata.role !== 'admin') {
     showScreen('denied');
     return;
   }
@@ -77,7 +78,7 @@ _supabase.auth.onAuthStateChange((event, session) => {
   if (session?.user) {
     currentUser = session.user;
 
-    if (currentUser.email !== ADMIN_EMAIL) {
+    if (!currentUser.user_metadata || currentUser.user_metadata.role !== 'admin') {
       showScreen('denied');
       return;
     }
@@ -163,7 +164,7 @@ async function doLogin() {
   currentUser = data.user;
 
   // Check admin status
-  if (currentUser.email !== ADMIN_EMAIL) {
+  if (!currentUser.user_metadata || currentUser.user_metadata.role !== 'admin') {
     await _supabase.auth.signOut();
     errEl.textContent = 'Access denied. This account is not authorised to use the dashboard.';
     errEl.style.display = 'block';
@@ -805,22 +806,23 @@ async function saveHeroOrder() {
 
 // ══════════════════════════════════════════════════════════
 // PAGES EDITOR
+// Edit About Us, Editorial Policy, Contact Us from dashboard
 // ══════════════════════════════════════════════════════════
 
-// Which page slug is currently loaded in the editor
-let currentPageSlug = 'about';
+let currentPageSlug = 'about'; // which page is currently loaded
 
-/** Called when a user clicks one of the About/Editorial/Contact tabs */
+/** Switch between page tabs (About / Editorial Policy / Contact) */
 function switchPageTab(slug, btn) {
-  // Update active tab button style
-  document.querySelectorAll('.page-tab').forEach(b => {
-    b.className = b === btn ? 'btn btn-primary btn-sm page-tab active' : 'btn btn-ghost btn-sm page-tab';
+  document.querySelectorAll('.page-tab').forEach(function(b) {
+    b.className = b === btn
+      ? 'btn btn-primary btn-sm page-tab active'
+      : 'btn btn-ghost btn-sm page-tab';
   });
   currentPageSlug = slug;
   loadPageEditor();
 }
 
-/** Fetch a page from Supabase and render the simple edit form */
+/** Load the chosen page from Supabase and show the edit form */
 async function loadPageEditor() {
   const wrap = document.getElementById('page-editor-wrap');
   wrap.innerHTML = '<div class="spinner"></div>';
@@ -831,13 +833,18 @@ async function loadPageEditor() {
     .eq('slug', currentPageSlug)
     .single();
 
+  // PGRST116 = no rows found — that's OK, it just hasn't been saved yet
   if (error && error.code !== 'PGRST116') {
-    // PGRST116 = no rows — page doesn't exist yet, that's fine
     wrap.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Error loading page: ' + error.message + '</p>';
     return;
   }
 
   const p = page || {};
+  const previewHref = currentPageSlug === 'about'
+    ? 'about.html'
+    : currentPageSlug === 'contact'
+      ? 'contact.html'
+      : 'editorial-policy.html';
 
   wrap.innerHTML = `
     <input type="hidden" id="page-id" value="${escHtml(p.id || '')}">
@@ -845,50 +852,52 @@ async function loadPageEditor() {
     <div class="form-row full" style="margin-bottom:14px">
       <div class="form-group">
         <label>Page Title</label>
-        <input type="text" id="page-title-input" value="${escHtml(p.title || '')}"
+        <input type="text" id="page-title-input"
+               value="${escHtml(p.title || '')}"
                placeholder="e.g. About Us">
-        <span class="form-hint">This shows as the heading on the page.</span>
+        <span class="form-hint">Shown as the main heading on the page.</span>
       </div>
     </div>
 
     <div class="form-row full" style="margin-bottom:20px">
       <div class="form-group">
         <label>Page Content</label>
-        <textarea id="page-content-input" style="min-height:360px;resize:vertical;font-size:13px;line-height:1.7"
-                  placeholder="Write the page content here.
+        <textarea id="page-content-input"
+                  style="min-height:380px;resize:vertical;font-size:13px;line-height:1.75"
+                  placeholder="Write content here.
 
-Use a blank line between paragraphs.
+Separate paragraphs with a blank line.
 
-SHORT ALL-CAPS LINES BECOME SECTION HEADINGS — for example:
+Short ALL-CAPS lines become section headings — for example:
 
 OUR MISSION
-This is the mission text here.
+Write your mission statement here.
 
-CONTACT
+CONTACT US
 Reach us at news@pdno.co.bw">${escHtml(p.content || '')}</textarea>
         <span class="form-hint">
-          ✏️ <strong>Tip:</strong> Separate paragraphs with a blank line.
-          Short ALL-CAPS lines (like OUR STORY) automatically become bold headings on the page.
+          ✏️ <strong>Tip:</strong> Use blank lines between paragraphs.
+          Short ALL-CAPS lines (like OUR MISSION) automatically become bold headings on the page.
         </span>
       </div>
     </div>
 
-    <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
       <button class="btn btn-primary" onclick="savePage()">
-        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
         Save Page
       </button>
-      <a href="${currentPageSlug === 'about' ? 'about.html' : currentPageSlug === 'contact' ? 'contact.html' : 'editorial-policy.html'}"
-         target="_blank" class="btn btn-ghost">
-        Preview →
+      <a href="${previewHref}" target="_blank" class="btn btn-ghost">
+        Preview Page →
       </a>
     </div>
-
     <div id="page-save-msg" style="margin-top:10px;font-size:12px;font-family:var(--font-ui);min-height:16px"></div>
   `;
 }
 
-/** Save the page content to Supabase */
+/** Save the edited page content to Supabase */
 async function savePage() {
   const existingId = document.getElementById('page-id').value;
   const title   = document.getElementById('page-title-input').value.trim();
@@ -909,11 +918,9 @@ async function savePage() {
 
   let error;
   if (existingId) {
-    // Update
     const res = await _supabase.from('pages').update(payload).eq('id', existingId);
     error = res.error;
   } else {
-    // Insert (page didn't exist yet)
     const res = await _supabase.from('pages').insert([payload]);
     error = res.error;
   }
@@ -926,14 +933,14 @@ async function savePage() {
 
   msgEl.innerHTML = '<span style="color:var(--green)">✓ Page saved! Changes are live on the website.</span>';
   toast('Page saved!', 'success');
-
-  // Reload so the hidden ID gets populated if it was a new insert
-  setTimeout(loadPageEditor, 800);
+  // Reload to populate the hidden ID if it was a fresh insert
+  setTimeout(loadPageEditor, 600);
 }
 
 
 // ══════════════════════════════════════════════════════════
 // NEWSLETTER SUBSCRIBERS
+// View and remove newsletter signups
 // ══════════════════════════════════════════════════════════
 
 async function loadSubscribers() {
@@ -947,7 +954,7 @@ async function loadSubscribers() {
     .order('subscribed_at', { ascending: false });
 
   if (error) {
-    wrap.innerHTML = '<p style="padding:20px;color:var(--text-muted)">Error loading subscribers: ' + error.message + '</p>';
+    wrap.innerHTML = '<p style="padding:20px;color:var(--text-muted)">Error: ' + error.message + '</p>';
     return;
   }
 
@@ -955,7 +962,7 @@ async function loadSubscribers() {
   if (countEl) countEl.textContent = subs.length + ' subscriber' + (subs.length !== 1 ? 's' : '');
 
   if (subs.length === 0) {
-    wrap.innerHTML = '<p style="padding:28px;color:var(--text-muted);font-size:13px;font-family:var(--font-ui)">No subscribers yet. They will appear here once readers sign up via the newsletter widget on the homepage.</p>';
+    wrap.innerHTML = '<p style="padding:28px;color:var(--text-muted);font-size:13px;font-family:var(--font-ui)">No subscribers yet. They appear here once readers sign up via the newsletter box on the homepage.</p>';
     return;
   }
 
@@ -963,44 +970,43 @@ async function loadSubscribers() {
     <table class="articles-table">
       <thead>
         <tr>
-          <th>#</th>
+          <th style="width:40px">#</th>
           <th>Email Address</th>
-          <th>Subscribed</th>
-          <th style="width:100px">Actions</th>
+          <th style="width:160px">Subscribed</th>
+          <th style="width:90px">Actions</th>
         </tr>
       </thead>
       <tbody>
-        ${subs.map((s, i) => `
+        ${subs.map(function(s, i) { return `
           <tr>
-            <td style="color:var(--text-muted);font-family:var(--font-ui);font-size:12px">${i + 1}</td>
+            <td style="color:var(--text-muted);font-size:12px;font-family:var(--font-ui)">${i + 1}</td>
             <td style="font-family:var(--font-ui);font-size:13px;font-weight:500">${escHtml(s.email)}</td>
             <td style="font-family:var(--font-ui);font-size:12px;color:var(--text-muted);white-space:nowrap">
-              ${s.subscribed_at ? new Date(s.subscribed_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—'}
+              ${s.subscribed_at
+                ? new Date(s.subscribed_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+                : '—'}
             </td>
             <td>
-              <button class="btn btn-danger btn-sm" onclick="deleteSubscriber('${s.id}', '${escHtml(s.email)}')">
+              <button class="btn btn-danger btn-sm"
+                      onclick="deleteSubscriber('${s.id}', '${escHtml(s.email)}')">
                 Remove
               </button>
             </td>
           </tr>
-        `).join('')}
+        `; }).join('')}
       </tbody>
     </table>
-    <div style="padding:12px 16px;background:var(--bg-soft);border-top:1px solid var(--border);font-family:var(--font-ui);font-size:11px;color:var(--text-muted)">
+    <div style="padding:12px 16px;background:var(--bg-soft);border-top:1px solid var(--border);
+                font-family:var(--font-ui);font-size:11px;color:var(--text-muted)">
       ${subs.length} total subscriber${subs.length !== 1 ? 's' : ''}.
-      You can copy these emails into your mailing list tool (Mailchimp, Brevo, etc.).
+      You can copy these emails into Mailchimp, Brevo, or any mailing tool.
     </div>
   `;
 }
 
 async function deleteSubscriber(id, email) {
   if (!confirm('Remove ' + email + ' from the subscriber list?')) return;
-
-  const { error } = await _supabase
-    .from('newsletter_subscribers')
-    .delete()
-    .eq('id', id);
-
+  const { error } = await _supabase.from('newsletter_subscribers').delete().eq('id', id);
   if (error) { toast('Could not remove: ' + error.message, 'error'); return; }
   toast('Subscriber removed.', 'success');
   loadSubscribers();
