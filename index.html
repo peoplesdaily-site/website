@@ -309,6 +309,12 @@
       .logo-name { font-size: 24px; }
       .sports-grid { grid-template-columns: 1fr; }
     }
+
+    /* ── Section scroll offset (accounts for sticky navbar height) ── */
+    #home, #local-news, #politics, #business, #sports,
+    #entertainment, #opinion, #newsletter {
+      scroll-margin-top: 54px;
+    }
   </style>
 </head>
 <body>
@@ -346,7 +352,10 @@
         <button class="search-btn" onclick="toggleSearch()" aria-label="Search">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </button>
-        <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Sign In</a>
+        <!-- Auth button — updated by checkAuthState() after Supabase loads -->
+        <div id="auth-btn-wrap">
+          <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Sign In</a>
+        </div>
         <a href="#newsletter" class="btn btn-primary" style="display:inline-block">Subscribe</a>
       </div>
     </div>
@@ -358,7 +367,7 @@
   <div class="container">
     <div class="navbar-inner">
       <ul class="nav-list">
-        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="#home" class="active">Home</a></li>
         <li><a href="#politics">Politics</a></li>
         <li><a href="#local-news">Local News</a></li>
         <li><a href="#local-news">Crime</a></li>
@@ -368,7 +377,7 @@
         <li><a href="#home">World</a></li>
         <li><a href="#opinion">Opinion</a></li>
         <li><a href="contact.html">Contact</a></li>
-        
+        <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
       </ul>
       <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -608,7 +617,7 @@
         <div class="footer-col">
           <h5>Sections</h5>
           <ul>
-            <li><a href="index.html">Home</a></li>
+            <li><a href="#home">Home</a></li>
             <li><a href="#politics">Politics</a></li>
             <li><a href="#local-news">Local News</a></li>
             <li><a href="#local-news">Crime &amp; Justice</a></li>
@@ -623,6 +632,7 @@
           <ul>
             <li><a href="about.html">About Us</a></li>
             <li><a href="editorial-policy.html">Editorial Policy</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Enquiry%20%E2%80%94%20People%27s%20Daily%20News%20Online&body=Hello%2C%0A%0AI%20would%20like%20to%20advertise%20on%20your%20website.%20Please%20get%20in%20touch%20with%20me%20to%20discuss%20available%20advertising%20options%20and%20packages.%0A%0AThank%20you.">Advertise With Us</a></li>
             <li><a href="contact.html">Contact Us</a></li>
             
           </ul>
@@ -631,7 +641,6 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="#newsletter">Daily Newsletter</a></li>
-            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Enquiry%20%E2%80%94%20People%27s%20Daily%20News%20Online&body=Hello%2C%0A%0AI%20would%20like%20to%20advertise%20on%20your%20website.%20Please%20get%20in%20touch%20with%20me%20to%20discuss%20available%20advertising%20options%20and%20packages.%0A%0AThank%20you.">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
@@ -664,20 +673,22 @@
     <button class="close-btn" onclick="toggleMenu()">✕</button>
   </div>
   <ul class="mobile-nav-list">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="#politics">Politics</a></li>
-    <li><a href="#local-news">Local News</a></li>
-    <li><a href="#local-news">Crime</a></li>
-    <li><a href="#business">Business</a></li>
-    <li><a href="#sports">Sports</a></li>
-    <li><a href="#entertainment">Entertainment</a></li>
-    <li><a href="#home">World</a></li>
-    <li><a href="#opinion">Opinion</a></li>
+    <li><a href="#home" onclick="toggleMenu()">Home</a></li>
+    <li><a href="#politics" onclick="toggleMenu()">Politics</a></li>
+    <li><a href="#local-news" onclick="toggleMenu()">Local News</a></li>
+    <li><a href="#local-news" onclick="toggleMenu()">Crime</a></li>
+    <li><a href="#business" onclick="toggleMenu()">Business</a></li>
+    <li><a href="#sports" onclick="toggleMenu()">Sports</a></li>
+    <li><a href="#entertainment" onclick="toggleMenu()">Entertainment</a></li>
+    <li><a href="#home" onclick="toggleMenu()">World</a></li>
+    <li><a href="#opinion" onclick="toggleMenu()">Opinion</a></li>
     <li><a href="contact.html">Contact</a></li>
-    
+    <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
     <li style="padding:20px 24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:10px">
-      <a href="dashboard.html" class="btn btn-outline btn-ghost">Sign In</a>
-      <a href="#newsletter" class="btn btn-primary">Subscribe</a>
+      <div id="mobile-auth-btn-wrap">
+        <a href="dashboard.html" class="btn btn-outline btn-ghost">Sign In</a>
+      </div>
+      <a href="#newsletter" class="btn btn-primary" onclick="toggleMenu()">Subscribe</a>
     </li>
   </ul>
 </div>
@@ -702,21 +713,26 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/main.js"></script>
+<script>checkAuthState();</script>
 
 <script>
-  // Date display
+  // ── Date display ──────────────────────────────────────────
   (function() {
     var d = new Date();
     var el = document.getElementById('current-date');
-    if (el) el.textContent = d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    if (el) el.textContent = d.toLocaleDateString('en-US', {
+      weekday:'long', year:'numeric', month:'long', day:'numeric'
+    });
   })();
 
+  // ── Mobile menu ───────────────────────────────────────────
   function toggleMenu() {
     var m = document.getElementById('mobileMenu');
     m.classList.toggle('open');
     document.body.style.overflow = m.classList.contains('open') ? 'hidden' : '';
   }
 
+  // ── Search overlay ────────────────────────────────────────
   function toggleSearch() {
     var s = document.getElementById('searchOverlay');
     s.classList.toggle('open');
@@ -743,14 +759,52 @@
       : '0 4px 16px rgba(0,0,0,0.10)';
   });
 
-  // ── Newsletter subscription ──────────────────────────────
-  // Inserts the email into the newsletter_subscribers Supabase table.
-  // _supabase is available because supabase-client.js loaded above.
+  // ── Auth-aware Sign In / Sign Out / Dashboard button ──────
+  // Runs after supabase-client.js has created _supabase.
+  // Shows the right button depending on who is signed in.
+  async function checkAuthState() {
+    try {
+      var sessionData = await _supabase.auth.getSession();
+      var session = sessionData.data.session;
+      var wrap       = document.getElementById('auth-btn-wrap');
+      var mobileWrap = document.getElementById('mobile-auth-btn-wrap');
+
+      if (!session) {
+        // Not signed in — show Sign In → dashboard
+        var btn = '<a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
+        if (wrap) wrap.innerHTML = btn;
+        if (mobileWrap) mobileWrap.innerHTML = '<a href="dashboard.html" class="btn btn-outline btn-ghost">Sign In</a>';
+        return;
+      }
+
+      var user = session.user;
+      var isAdmin = user.user_metadata && user.user_metadata.role === 'admin';
+
+      if (isAdmin) {
+        // Admin is signed in — show Dashboard button
+        if (wrap) wrap.innerHTML = '<a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
+        if (mobileWrap) mobileWrap.innerHTML = '<a href="dashboard.html" class="btn btn-outline btn-ghost">Dashboard</a>';
+      } else {
+        // Regular user signed in — show Sign Out
+        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
+        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button>';
+      }
+    } catch(e) {
+      // Supabase not available or error — leave default Sign In button
+    }
+  }
+
+  async function signOutUser() {
+    await _supabase.auth.signOut();
+    window.location.reload();
+  }
+
+  // ── Newsletter subscription ───────────────────────────────
   async function subscribeNewsletter() {
-    var input   = document.getElementById('newsletter-email');
-    var msgEl   = document.getElementById('newsletter-msg');
-    var btn     = document.querySelector('.newsletter-btn');
-    var email   = input.value.trim();
+    var input = document.getElementById('newsletter-email');
+    var msgEl = document.getElementById('newsletter-msg');
+    var btn   = document.querySelector('.newsletter-btn');
+    var email = input.value.trim();
 
     if (!email || email.indexOf('@') === -1) {
       msgEl.innerHTML = '<span style="color:#e74c3c">Please enter a valid email address.</span>';
@@ -769,7 +823,6 @@
 
     if (result.error) {
       if (result.error.code === '23505') {
-        // Unique violation — already subscribed
         msgEl.innerHTML = '<span style="color:#27ae60">✓ You're already subscribed!</span>';
       } else {
         msgEl.innerHTML = '<span style="color:#e74c3c">Something went wrong. Please try again.</span>';
@@ -780,7 +833,6 @@
     }
   }
 
-  // Allow pressing Enter in newsletter input
   document.getElementById('newsletter-email').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') subscribeNewsletter();
   });
