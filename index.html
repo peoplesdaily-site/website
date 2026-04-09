@@ -377,7 +377,7 @@
         <li><a href="#home">World</a></li>
         <li><a href="#opinion">Opinion</a></li>
         <li><a href="contact.html">Contact</a></li>
-        <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
+        <li class="nav-dashboard" id="nav-dashboard-li" style="display:none"><a href="dashboard.html">News Dashboard</a></li>
       </ul>
       <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -683,7 +683,7 @@
     <li><a href="#home" onclick="toggleMenu()">World</a></li>
     <li><a href="#opinion" onclick="toggleMenu()">Opinion</a></li>
     <li><a href="contact.html">Contact</a></li>
-    <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
+    <li class="nav-dashboard" id="mobile-nav-dashboard-li" style="display:none"><a href="dashboard.html">News Dashboard</a></li>
     <li style="padding:20px 24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:10px">
       <div id="mobile-auth-btn-wrap">
         <a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>
@@ -770,24 +770,36 @@
       var mobileWrap = document.getElementById('mobile-auth-btn-wrap');
 
       if (!session) {
-        // Not signed in — show Sign In → dashboard
+        // Not signed in — show Sign In, hide dashboard nav link
         var btn = '<a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
         if (wrap) wrap.innerHTML = btn;
         if (mobileWrap) mobileWrap.innerHTML = '<a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>';
+        var navD = document.getElementById('nav-dashboard-li');
+        var mNavD = document.getElementById('mobile-nav-dashboard-li');
+        if (navD) navD.style.display = 'none';
+        if (mNavD) mNavD.style.display = 'none';
         return;
       }
 
       var user = session.user;
-      var isAdmin = user.user_metadata && user.user_metadata.role === 'admin';
+      var isAdmin = (user.user_metadata && user.user_metadata.role === 'admin') ||
+                    (user.app_metadata  && user.app_metadata.role  === 'admin');
+
+      var navDashLi       = document.getElementById('nav-dashboard-li');
+      var mobileNavDashLi = document.getElementById('mobile-nav-dashboard-li');
 
       if (isAdmin) {
-        // Admin is signed in — show Dashboard button
+        // Admin is signed in — show Dashboard button and nav link
         if (wrap) wrap.innerHTML = '<a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
         if (mobileWrap) mobileWrap.innerHTML = '<a href="dashboard.html" class="btn btn-outline btn-ghost">Dashboard</a>';
+        if (navDashLi) navDashLi.style.display = '';
+        if (mobileNavDashLi) mobileNavDashLi.style.display = '';
       } else {
-        // Regular user signed in — show Sign Out
+        // Regular user signed in — show Sign Out, hide dashboard nav link
         if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
         if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button>';
+        if (navDashLi) navDashLi.style.display = 'none';
+        if (mobileNavDashLi) mobileNavDashLi.style.display = 'none';
       }
     } catch(e) {
       // Supabase not available or error — leave default Sign In button
