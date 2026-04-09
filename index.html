@@ -756,51 +756,28 @@
   });
 
   // ── Auth-aware Sign In / Sign Out / Dashboard button ──────
-  // Runs after supabase-client.js has created _supabase.
-  // Shows the right button depending on who is signed in.
-  async function checkAuthState() {
-    try {
-      var sessionData = await _supabase.auth.getSession();
-      var session = sessionData.data.session;
-      var wrap       = document.getElementById('auth-btn-wrap');
-      var mobileWrap = document.getElementById('mobile-auth-btn-wrap');
+  function applyAuthUI(session) {
+    var wrap       = document.getElementById('auth-btn-wrap');
+    var mobileWrap = document.getElementById('mobile-auth-btn-wrap');
 
-      if (!session) {
-        // Not signed in — show Sign In, hide dashboard nav link
-        var btn = '<a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
-        if (wrap) wrap.innerHTML = btn;
-        if (mobileWrap) mobileWrap.innerHTML = '<a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>';
-        var navD = document.getElementById('nav-dashboard-li');
-        var mNavD = document.getElementById('mobile-nav-dashboard-li');
-        if (navD) navD.style.display = 'none';
-        if (mNavD) mNavD.style.display = 'none';
-        return;
-      }
+    if (!session) {
+      if (wrap) wrap.innerHTML = '<a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
+      if (mobileWrap) mobileWrap.innerHTML = '<a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>';
+      return;
+    }
 
-      var user = session.user;
-      var ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
-      var isAdmin = (user.user_metadata && user.user_metadata.role === 'admin') ||
-                    (user.app_metadata  && user.app_metadata.role  === 'admin') ||
-                    (user.email === ADMIN_EMAIL);
+    var user = session.user;
+    var ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
+    var isAdmin = (user.user_metadata && user.user_metadata.role === 'admin') ||
+                  (user.app_metadata  && user.app_metadata.role  === 'admin') ||
+                  (user.email === ADMIN_EMAIL);
 
-      var navDashLi       = document.getElementById('nav-dashboard-li');
-      var mobileNavDashLi = document.getElementById('mobile-nav-dashboard-li');
-
-      if (isAdmin) {
-        // Admin is signed in — show Sign Out + Dashboard, reveal nav link
-        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
-        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-outline btn-ghost">Dashboard</a>';
-        if (navDashLi) navDashLi.style.display = '';
-        if (mobileNavDashLi) mobileNavDashLi.style.display = '';
-      } else {
-        // Regular user signed in — show Sign Out only, hide dashboard nav link
-        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
-        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button>';
-        if (navDashLi) navDashLi.style.display = 'none';
-        if (mobileNavDashLi) mobileNavDashLi.style.display = 'none';
-      }
-    } catch(e) {
-      // Supabase not available or error — leave default Sign In button
+    if (isAdmin) {
+      if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
+      if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-outline btn-ghost">Dashboard</a>';
+    } else {
+      if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
+      if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button>';
     }
   }
 
@@ -809,7 +786,15 @@
     window.location.reload();
   }
 
-  checkAuthState();
+  // onAuthStateChange fires reliably when Supabase confirms session from cache
+  _supabase.auth.onAuthStateChange(function(event, session) {
+    applyAuthUI(session);
+  });
+
+  // getSession as immediate belt-and-suspenders backup
+  _supabase.auth.getSession().then(function(r) {
+    applyAuthUI(r.data.session);
+  }).catch(function() {});
 
   // ── Newsletter subscription ───────────────────────────────
   async function subscribeNewsletter() {
