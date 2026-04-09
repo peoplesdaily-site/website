@@ -298,8 +298,8 @@
       }
 
       const user = data.user;
-      if (user && user.email === ADMIN_EMAIL) {
-        window.location.href = 'index.html';
+      if (user && (user.user_metadata?.role === 'admin' || user.email === ADMIN_EMAIL)) {
+        window.location.href = 'dashboard.html';
       } else {
         window.location.href = 'index.html';
       }
