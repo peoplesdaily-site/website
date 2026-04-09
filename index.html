@@ -323,7 +323,7 @@
 <div class="top-bar">
   <div class="container">
     <div class="top-bar-inner">
-      <span id="current-date"><script>document.write(new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}))</script></span>
+      <span id="current-date">Loading…</span>
       <div class="top-bar-social">
         <a href="#" aria-label="Facebook">
           <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
@@ -356,7 +356,7 @@
         <div id="auth-btn-wrap">
           <a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>
         </div>
-        <a href="#newsletter" class="btn btn-outline" style="display:inline-block">Subscribe</a>
+        <a href="#newsletter" class="btn btn-primary" style="display:inline-block">Subscribe</a>
       </div>
     </div>
   </div>
@@ -638,12 +638,12 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="#newsletter">Daily Newsletter</a></li>
-            <li><a href="/cdn-cgi/l/email-protection#6111040e110d04120500080d180f0416120e0f0d080f0421060c00080d4f020e0c">Advertise With Us</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
               Have a tip?<br>
-              <a href="/cdn-cgi/l/email-protection#8efeebe1fee2ebfdeaefe7e2f7e0ebf9fde1e0e2e7e0ebcee9e3efe7e2a0ede1e3" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="d7a7b2b8a7bbb2a4b3b6bebbaeb9b2a0a4b8b9bbbeb9b297b0bab6bebbf9b4b8ba">[email&#160;protected]</span></a>
+              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
             </p>
           </div>
         </div>
@@ -685,7 +685,7 @@
       <div id="mobile-auth-btn-wrap">
         <a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>
       </div>
-      <a href="#newsletter" class="btn btn-outline btn-ghost" onclick="toggleMenu()">Subscribe</a>
+      <a href="#newsletter" class="btn btn-primary" onclick="toggleMenu()">Subscribe</a>
     </li>
   </ul>
 </div>
@@ -707,7 +707,7 @@
      2. supabase-client.js (creates _supabase)
      3. main.js (uses _supabase to fetch & render)
 ════════════════════════════════════════════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/main.js"></script>
 
@@ -756,28 +756,51 @@
   });
 
   // ── Auth-aware Sign In / Sign Out / Dashboard button ──────
-  function applyAuthUI(session) {
-    var wrap       = document.getElementById('auth-btn-wrap');
-    var mobileWrap = document.getElementById('mobile-auth-btn-wrap');
+  // Runs after supabase-client.js has created _supabase.
+  // Shows the right button depending on who is signed in.
+  async function checkAuthState() {
+    try {
+      var sessionData = await _supabase.auth.getSession();
+      var session = sessionData.data.session;
+      var wrap       = document.getElementById('auth-btn-wrap');
+      var mobileWrap = document.getElementById('mobile-auth-btn-wrap');
 
-    if (!session) {
-      if (wrap) wrap.innerHTML = '<a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
-      if (mobileWrap) mobileWrap.innerHTML = '<a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>';
-      return;
-    }
+      if (!session) {
+        // Not signed in — show Sign In, hide dashboard nav link
+        var btn = '<a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
+        if (wrap) wrap.innerHTML = btn;
+        if (mobileWrap) mobileWrap.innerHTML = '<a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>';
+        var navD = document.getElementById('nav-dashboard-li');
+        var mNavD = document.getElementById('mobile-nav-dashboard-li');
+        if (navD) navD.style.display = 'none';
+        if (mNavD) mNavD.style.display = 'none';
+        return;
+      }
 
-    var user = session.user;
-    var ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
-    var isAdmin = (user.user_metadata && user.user_metadata.role === 'admin') ||
-                  (user.app_metadata  && user.app_metadata.role  === 'admin') ||
-                  (user.email === ADMIN_EMAIL);
+      var user = session.user;
+      var ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
+      var isAdmin = (user.user_metadata && user.user_metadata.role === 'admin') ||
+                    (user.app_metadata  && user.app_metadata.role  === 'admin') ||
+                    (user.email === ADMIN_EMAIL);
 
-    if (isAdmin) {
-      if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
-      if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-outline btn-ghost">Dashboard</a>';
-    } else {
-      if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
-      if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button>';
+      var navDashLi       = document.getElementById('nav-dashboard-li');
+      var mobileNavDashLi = document.getElementById('mobile-nav-dashboard-li');
+
+      if (isAdmin) {
+        // Admin is signed in — show Sign Out + Dashboard, reveal nav link
+        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
+        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-outline btn-ghost">Dashboard</a>';
+        if (navDashLi) navDashLi.style.display = '';
+        if (mobileNavDashLi) mobileNavDashLi.style.display = '';
+      } else {
+        // Regular user signed in — show Sign Out only, hide dashboard nav link
+        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
+        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline btn-ghost">Sign Out</button>';
+        if (navDashLi) navDashLi.style.display = 'none';
+        if (mobileNavDashLi) mobileNavDashLi.style.display = 'none';
+      }
+    } catch(e) {
+      // Supabase not available or error — leave default Sign In button
     }
   }
 
@@ -785,16 +808,6 @@
     await _supabase.auth.signOut();
     window.location.reload();
   }
-
-  // onAuthStateChange fires reliably when Supabase confirms session from cache
-  _supabase.auth.onAuthStateChange(function(event, session) {
-    applyAuthUI(session);
-  });
-
-  // getSession as immediate belt-and-suspenders backup
-  _supabase.auth.getSession().then(function(r) {
-    applyAuthUI(r.data.session);
-  }).catch(function() {});
 
   // ── Newsletter subscription ───────────────────────────────
   async function subscribeNewsletter() {
@@ -825,4 +838,18 @@
         msgEl.innerHTML = '<span style="color:#e74c3c">Something went wrong. Please try again.</span>';
       }
     } else {
-      msgEl.innerHTML = '<span style="color:#2
+      msgEl.innerHTML = '<span style="color:#27ae60">✓ Subscribed! Thank you for joining.</span>';
+      input.value = '';
+    }
+  }
+
+  document.getElementById('newsletter-email').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') subscribeNewsletter();
+  });
+
+  // Call after all functions are defined
+  checkAuthState();
+</script>
+
+</body>
+</html>
