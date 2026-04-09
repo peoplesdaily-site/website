@@ -49,7 +49,9 @@ let currentUser  = null; // signed-in Supabase user object
   currentUser = session.user;
 
   // Check if this user is the admin
-  if (!currentUser.user_metadata || currentUser.user_metadata.role !== 'admin') {
+  const isAdmin = (currentUser.user_metadata && currentUser.user_metadata.role === 'admin') ||
+                  (currentUser.app_metadata  && currentUser.app_metadata.role  === 'admin');
+  if (!isAdmin) {
     showScreen('denied');
     return;
   }
@@ -72,7 +74,9 @@ _supabase.auth.onAuthStateChange((event, session) => {
   if (session?.user) {
     currentUser = session.user;
 
-    if (!currentUser.user_metadata || currentUser.user_metadata.role !== 'admin') {
+    const isAdminUser = (currentUser.user_metadata && currentUser.user_metadata.role === 'admin') ||
+                        (currentUser.app_metadata  && currentUser.app_metadata.role  === 'admin');
+    if (!isAdminUser) {
       showScreen('denied');
       return;
     }
