@@ -351,32 +351,7 @@
 </head>
 <body class="auth-pending" style="visibility:hidden">
 
-<!-- ════════════════════════════════════════════════════════
-     LOGIN SCREEN
-     Shown when user is not authenticated.
-═════════════════════════════════════════════════════════ -->
-<div id="login-screen" class="login-screen" style="display:none">
-  <div class="login-box">
-    <div class="login-logo">
-      <img src="images/thumbnail (6).png" alt="PDNO" onerror="this.style.display='none'">
-      <h2>News Dashboard</h2>
-      <p>People's Daily News Online — Admin Access</p>
-    </div>
-    <div class="login-error" id="login-error"></div>
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email">
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <button class="login-btn" onclick="doLogin()">Sign In to Dashboard</button>
-    <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:14px">
-      <a href="index.html" style="color:var(--primary)">← Return to website</a>
-    </p>
-  </div>
-</div>
+<!-- Login screen removed: unauthenticated users are redirected to signin.html by dashboard.js -->
 
 <!-- ════════════════════════════════════════════════════════
      ACCESS DENIED
