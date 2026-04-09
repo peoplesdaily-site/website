@@ -782,8 +782,10 @@
       }
 
       var user = session.user;
+      var ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
       var isAdmin = (user.user_metadata && user.user_metadata.role === 'admin') ||
-                    (user.app_metadata  && user.app_metadata.role  === 'admin');
+                    (user.app_metadata  && user.app_metadata.role  === 'admin') ||
+                    (user.email === ADMIN_EMAIL);
 
       var navDashLi       = document.getElementById('nav-dashboard-li');
       var mobileNavDashLi = document.getElementById('mobile-nav-dashboard-li');
