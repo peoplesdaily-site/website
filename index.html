@@ -109,7 +109,7 @@
     .masthead { background: var(--bg); padding: 18px 0 14px; border-bottom: 1px solid var(--border); }
     .masthead-inner { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; }
     .logo-wrap { display: flex; align-items: center; gap: 14px; text-decoration: none; }
-    .logo-img { height: 128px; width: auto; object-fit: contain; border-radius: 6px; }
+    .logo-img { height: 64px; width: auto; object-fit: contain; border-radius: 6px; }
     .logo-name { font-family: var(--font-display); font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; line-height: 1; }
     .logo-name em { color: var(--accent); font-style: normal; }
     .logo-tagline { font-family: var(--font-ui); font-size: 9.5px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-top: 3px; }
@@ -249,7 +249,7 @@
     .footer-top { background: #0d2240; padding: 48px 0 36px; border-top: 3px solid var(--accent); }
     .footer-grid { display: grid; grid-template-columns: 1.9fr 1fr 1fr 1fr; gap: 40px; }
     .footer-brand { min-height: 220px; display: flex; flex-direction: column; justify-content: flex-start; }
-    .footer-logo-img { width: 100%; max-width: 300px; height: auto; object-fit: contain; margin-bottom: 18px; display: block; }
+    .footer-logo-img { height: 56px; width: auto; object-fit: contain; border-radius: 6px; margin-bottom: 12px; display: block; }
     .footer-desc { font-family: var(--font-ui); font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.65; margin-bottom: 20px; }
     .footer-col h5 { font-family: var(--font-ui); font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: #ffffff; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
     .footer-col ul li { margin-bottom: 9px; }
@@ -377,7 +377,6 @@
         <li><a href="#home">World</a></li>
         <li><a href="#opinion">Opinion</a></li>
         <li><a href="contact.html">Contact</a></li>
-        <li class="nav-dashboard" id="nav-dashboard-li" style="display:none"><a href="dashboard.html">News Dashboard</a></li>
       </ul>
       <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -632,20 +631,19 @@
           <ul>
             <li><a href="about.html">About Us</a></li>
             <li><a href="editorial-policy.html">Editorial Policy</a></li>
-            <li><a href="/cdn-cgi/l/email-protection#b4c4d1dbc4d8d1c7d0d5ddd8cddad1c3c7dbdad8dddad1f4d3d9d5ddd89ad7dbd98bc7c1d6ded1d7c089f5d0c2d1c6c0ddc7dddad3918684f1dac5c1ddc6cd91868491f186918c84918d80918684e4d1dbc4d8d1918683c7918684f0d5ddd8cd918684fad1c3c7918684fbdad8dddad192d6dbd0cd89fcd1d8d8db9186f79184f59184f5fd918684c3dbc1d8d0918684d8dddfd1918684c0db918684d5d0c2d1c6c0ddc7d1918684dbda918684cddbc1c6918684c3d1d6c7ddc0d19a918684e4d8d1d5c7d1918684d3d1c0918684ddda918684c0dbc1d7dc918684c3ddc0dc918684d9d1918684c0db918684d0ddc7d7c1c7c7918684d5c2d5ddd8d5d6d8d1918684d5d0c2d1c6c0ddc7dddad3918684dbc4c0dddbdac7918684d5dad0918684c4d5d7dfd5d3d1c79a9184f59184f5e0dcd5dadf918684cddbc19a">Advertise With Us</a></li>
             <li><a href="contact.html">Contact Us</a></li>
-            
           </ul>
         </div>
         <div class="footer-col">
           <h5>Subscribe</h5>
           <ul>
             <li><a href="#newsletter">Daily Newsletter</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
               Have a tip?<br>
-              <a href="/cdn-cgi/l/email-protection#36585341457646525859185559185441" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="69070c1e1a29190d0706470a06470b1e">[email&#160;protected]</span></a>
+              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
             </p>
           </div>
         </div>
@@ -683,7 +681,6 @@
     <li><a href="#home" onclick="toggleMenu()">World</a></li>
     <li><a href="#opinion" onclick="toggleMenu()">Opinion</a></li>
     <li><a href="contact.html">Contact</a></li>
-    <li class="nav-dashboard" id="mobile-nav-dashboard-li" style="display:none"><a href="dashboard.html">News Dashboard</a></li>
     <li style="padding:20px 24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:10px">
       <div id="mobile-auth-btn-wrap">
         <a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>
