@@ -35,20 +35,14 @@ let currentUser  = null; // signed-in Supabase user object
 // ══════════════════════════════════════════════════════════
 // INITIALISATION — runs on page load
 // ══════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  document.body.style.visibility = 'visible';
-  document.body.classList.add('auth-ready');
-  document.body.classList.remove('auth-pending');
-});
-
 (async function init() {
 
   // Check if a user is already signed in
   const { data: { session } } = await _supabase.auth.getSession();
 
   if (!session) {
-    // Not signed in → show login screen
-    showScreen('login');
+    // Not signed in → redirect to signin page
+    window.location.href = 'signin.html';
     return;
   }
 
@@ -71,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 _supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_OUT') {
     currentUser = null;
-    showScreen('login');
+    window.location.href = 'signin.html';
     return;
   }
 
@@ -93,7 +87,6 @@ _supabase.auth.onAuthStateChange((event, session) => {
 // ══════════════════════════════════════════════════════════
 
 function showScreen(which) {
-  document.getElementById('login-screen').style.display    = which === 'login'     ? 'flex'  : 'none';
   document.getElementById('access-denied').style.display   = which === 'denied'    ? 'flex'  : 'none';
   document.getElementById('dashboard-shell').style.display = which === 'dashboard' ? 'grid'  : 'none';
 
@@ -137,58 +130,15 @@ function showView(id) {
   if (id === 'view-subscribers')  loadSubscribers();
 }
 
+
 // ══════════════════════════════════════════════════════════
-// AUTH — LOGIN & SIGN OUT
+// AUTH — SIGN OUT
 // ══════════════════════════════════════════════════════════
-
-async function doLogin() {
-  const email    = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const errEl    = document.getElementById('login-error');
-  errEl.style.display = 'none';
-
-  if (!email || !password) {
-    errEl.textContent = 'Please enter your email and password.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-
-  if (error) {
-    errEl.textContent = 'Sign in failed: ' + error.message;
-    errEl.style.display = 'block';
-    return;
-  }
-
-  currentUser = data.user;
-
-  // Check admin status
-  if (!currentUser.user_metadata || currentUser.user_metadata.role !== 'admin') {
-    await _supabase.auth.signOut();
-    errEl.textContent = 'Access denied. This account is not authorised to use the dashboard.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  document.getElementById('nav-user-email').textContent = currentUser.email;
-  showScreen('dashboard');
-  loadOverview();
-}
-
-// Allow pressing Enter in login form
-document.getElementById('login-password').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-document.getElementById('login-email').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
 
 async function doSignOut() {
   await _supabase.auth.signOut();
   currentUser = null;
-  showScreen('login');
-  toast('Signed out successfully.', 'success');
+  window.location.href = 'signin.html';
 }
 
 // ══════════════════════════════════════════════════════════
