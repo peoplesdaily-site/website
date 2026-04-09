@@ -49,8 +49,10 @@ let currentUser  = null; // signed-in Supabase user object
   currentUser = session.user;
 
   // Check if this user is the admin
+  const ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
   const isAdmin = (currentUser.user_metadata && currentUser.user_metadata.role === 'admin') ||
-                  (currentUser.app_metadata  && currentUser.app_metadata.role  === 'admin');
+                  (currentUser.app_metadata  && currentUser.app_metadata.role  === 'admin') ||
+                  (currentUser.email === ADMIN_EMAIL);
   if (!isAdmin) {
     showScreen('denied');
     return;
@@ -75,7 +77,8 @@ _supabase.auth.onAuthStateChange((event, session) => {
     currentUser = session.user;
 
     const isAdminUser = (currentUser.user_metadata && currentUser.user_metadata.role === 'admin') ||
-                        (currentUser.app_metadata  && currentUser.app_metadata.role  === 'admin');
+                        (currentUser.app_metadata  && currentUser.app_metadata.role  === 'admin') ||
+                        (currentUser.email === ADMIN_EMAIL);
     if (!isAdminUser) {
       showScreen('denied');
       return;
