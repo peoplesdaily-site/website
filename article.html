@@ -198,7 +198,10 @@
              onerror="this.outerHTML='<span class=\'logo-name\'>People\'s <em>Daily</em></span>'">
       </a>
       <div class="masthead-actions">
-        <a href="index.html" class="btn btn-outline">← Back to News</a>
+        <div id="auth-btn-wrap">
+          <a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>
+        </div>
+        <a href="index.html#newsletter" class="btn btn-outline" style="display:inline-block">Subscribe</a>
       </div>
     </div>
   </div>
@@ -218,7 +221,7 @@
         <li><a href="index.html#entertainment">Entertainment</a></li>
         <li><a href="index.html">World</a></li>
         <li><a href="index.html#opinion">Opinion</a></li>
-        <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
+        <li><a href="contact.html">Contact</a></li>
       </ul>
       <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
     </div>
@@ -285,12 +288,12 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="index.html#newsletter">Daily Newsletter</a></li>
-            <li><a href="mailto:peoplesdailynewsonline@gmail.com">Advertise With Us</a></li>
+            <li><a href="/cdn-cgi/l/email-protection#0373666c736f667067626a6f7a6d6674706c6d6f6a6d6643646e626a6f2d606c6e">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
               Have a tip?<br>
-              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
+              <a href="/cdn-cgi/l/email-protection#58283d3728343d2b3c39313421363d2f2b37363431363d183f35393134763b3735" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="99e9fcf6e9f5fceafdf8f0f5e0f7fceeeaf6f7f5f0f7fcd9fef4f8f0f5b7faf6f4">[email&#160;protected]</span></a>
             </p>
           </div>
         </div>
@@ -310,7 +313,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <div class="mobile-menu-header">
     <img src="images/thumbnail (6).png" alt="" style="height:36px;width:auto;object-fit:contain">
-    <button class="close-btn" onclick="toggleMenu()">✕</button>
+    <button class="close-btn" id="close-menu-btn" onclick="toggleMenu()">✕</button>
   </div>
   <ul class="mobile-nav-list">
     <li><a href="index.html">Home</a></li>
@@ -318,18 +321,71 @@
     <li><a href="index.html#local-news">Local News</a></li>
     <li><a href="index.html#sports">Sports</a></li>
     <li><a href="index.html#entertainment">Entertainment</a></li>
-    <li class="nav-dashboard"><a href="dashboard.html">News Dashboard</a></li>
+    <li><a href="contact.html">Contact</a></li>
   </ul>
+  <div class="mobile-menu-footer" style="padding:20px 24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:10px;flex-wrap:wrap">
+    <div id="mobile-auth-btn-wrap">
+      <a href="signin.html" class="btn btn-ghost">Sign In</a>
+    </div>
+    <a href="index.html#newsletter" class="btn btn-ghost">Subscribe</a>
+  </div>
 </div>
 
 <!-- Load Supabase CDN, then our client, then article logic -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/article.js"></script>
-
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 <script>
-  // Date
+  // ── Date ──────────────────────────────────────────────────
   (function() {
-    var d = new Date();
     var el = document.getElementById('current-date');
-    if (el) el.textContent = d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'num
+    if (el) el.textContent = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+  })();
+
+  // ── Mobile menu ───────────────────────────────────────────
+  function toggleMenu() {
+    var m = document.getElementById('mobileMenu');
+    m.classList.toggle('open');
+    document.body.style.overflow = m.classList.contains('open') ? 'hidden' : '';
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // ── Auth-aware buttons ────────────────────────────────────
+  async function checkAuthState() {
+    try {
+      var sessionData = await _supabase.auth.getSession();
+      var session = sessionData.data.session;
+      var wrap       = document.getElementById('auth-btn-wrap');
+      var mobileWrap = document.getElementById('mobile-auth-btn-wrap');
+      if (!session) {
+        if (wrap) wrap.innerHTML = '<a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
+        if (mobileWrap) mobileWrap.innerHTML = '<a href="signin.html" class="btn btn-ghost">Sign In</a>';
+        return;
+      }
+      var user = session.user;
+      var ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
+      var isAdmin = (user.user_metadata && user.user_metadata.role === 'admin') ||
+                   (user.app_metadata  && user.app_metadata.role  === 'admin') ||
+                   (user.email === ADMIN_EMAIL);
+      if (isAdmin) {
+        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
+        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>';
+      } else {
+        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
+        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button>';
+      }
+    } catch(e) {}
+  }
+  async function signOutUser() {
+    await _supabase.auth.signOut();
+    window.location.reload();
+  }
+  checkAuthState();
+</script>
+</body>
+</html>
