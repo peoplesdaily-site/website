@@ -48,6 +48,7 @@
     .logo-img { height:64px; width:auto; object-fit:contain; border-radius:6px; }
     .logo-name { font-family:var(--font-display); font-size:32px; font-weight:800; color:var(--primary); }
     .logo-name em { color:var(--accent); font-style:normal; }
+    .logo-tagline { font-family:var(--font-ui); font-size:9.5px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted); margin-top:2px; }
     .masthead-actions { display:flex; gap:10px; }
     .btn { font-family:var(--font-ui); font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; padding:9px 20px; border-radius:var(--radius); cursor:pointer; border:none; display:inline-block; }
     .btn-outline { background:transparent; color:var(--primary); border:1.5px solid var(--primary); }
@@ -184,7 +185,7 @@
 <div class="top-bar">
   <div class="container">
     <div class="top-bar-inner">
-      <span id="current-date"></span>
+      <span id="current-date"><script>document.write(new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}))</script></span>
     </div>
   </div>
 </div>
@@ -195,7 +196,11 @@
     <div class="masthead-inner">
       <a href="index.html" class="logo-wrap">
         <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="logo-img"
-             onerror="this.outerHTML='<span class=\'logo-name\'>People\'s <em>Daily</em></span>'">
+             onerror="this.style.display='none'">
+        <div>
+          <div class="logo-name">People's <em>Daily</em></div>
+          <div class="logo-tagline">News Online</div>
+        </div>
       </a>
       <div class="masthead-actions">
         <div id="auth-btn-wrap">
@@ -332,7 +337,7 @@
 </div>
 
 <!-- Load Supabase CDN, then our client, then article logic -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ── Date ──────────────────────────────────────────────────
   (function() {
