@@ -713,7 +713,6 @@
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/main.js"></script>
-<script>checkAuthState();</script>
 
 <script>
   // ── Date display ──────────────────────────────────────────
@@ -850,6 +849,9 @@
   document.getElementById('newsletter-email').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') subscribeNewsletter();
   });
+
+  // Call after all functions are defined
+  checkAuthState();
 </script>
 
 </body>
