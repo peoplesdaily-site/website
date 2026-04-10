@@ -109,7 +109,7 @@
     .masthead { background: var(--bg); padding: 18px 0 14px; border-bottom: 1px solid var(--border); }
     .masthead-inner { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; }
     .logo-wrap { display: flex; align-items: center; gap: 14px; text-decoration: none; }
-    .logo-img { height: 64px; width: auto; object-fit: contain; border-radius: 6px; }
+    .logo-img { height: 128px; width: auto; object-fit: contain; border-radius: 6px; }
     .logo-name { font-family: var(--font-display); font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; line-height: 1; }
     .logo-name em { color: var(--accent); font-style: normal; }
     .logo-tagline { font-family: var(--font-ui); font-size: 9.5px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-top: 3px; }
@@ -249,7 +249,7 @@
     .footer-top { background: #0d2240; padding: 48px 0 36px; border-top: 3px solid var(--accent); }
     .footer-grid { display: grid; grid-template-columns: 1.9fr 1fr 1fr 1fr; gap: 40px; }
     .footer-brand { min-height: 220px; display: flex; flex-direction: column; justify-content: flex-start; }
-    .footer-logo-img { height: 56px; width: auto; object-fit: contain; border-radius: 6px; margin-bottom: 12px; display: block; }
+    .footer-logo-img { height: 224px; width: auto; object-fit: contain; border-radius: 6px; margin-bottom: 12px; display: block; }
     .footer-desc { font-family: var(--font-ui); font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.65; margin-bottom: 20px; }
     .footer-col h5 { font-family: var(--font-ui); font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: #ffffff; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
     .footer-col ul li { margin-bottom: 9px; }
@@ -306,7 +306,7 @@
     @media (max-width: 480px) {
       .masthead-inner { grid-template-columns: 1fr auto; }
       .logo-tagline { display: none; }
-      .logo-name { font-size: 24px; }
+      .logo-img { height: 80px; }
       .sports-grid { grid-template-columns: 1fr; }
     }
 
@@ -356,7 +356,7 @@
         <div id="auth-btn-wrap">
           <a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>
         </div>
-        <a href="#newsletter" class="btn btn-primary" style="display:inline-block">Subscribe</a>
+        <a href="#newsletter" class="btn btn-outline" style="display:inline-block">Subscribe</a>
       </div>
     </div>
   </div>
@@ -394,7 +394,7 @@
            onerror="this.parentElement.innerHTML='<div style=\'font-family:var(--font-ui);font-size:13px;color:var(--text-muted);padding:20px 0;\'>📢 <strong>Advertise With Us</strong> — Reach thousands of daily readers.</div>'">
     </div>
     <div class="ad-cta-wrap">
-      <a href="/cdn-cgi/l/email-protection#1c6c79736c70796f787d75706572796b6f7372707572795c7b717d7570327f7371236f697e76797f68215d786a796e68756f75727b392e2c59726d69756e65392e2c39592e39242c392528392e2c4c79736c7079392e2b6f392e2c587d757065392e2c52796b6f392e2c5372707572793a7e737865215479707073392e5f392c5d392c5d55392e2c6b73697078392e2c70757779392e2c6873392e2c7d786a796e68756f79392e2c7372392e2c6573696e392e2c6b797e6f75687932392e2c4c70797d6f79392e2c7b7968392e2c7572392e2c6873697f74392e2c6b756874392e2c7179392e2c6873392e2c78756f7f696f6f392e2c7d6a7d75707d7e7079392e2c7d786a796e68756f75727b392e2c736c687573726f392e2c7d7278392e2c6c7d7f777d7b796f32392c5d392c5d48747d7277392e2c65736932" class="ad-cta">Advertise With Us</a>
+      <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website." class="ad-cta">Advertise With Us</a>
     </div>
   </div>
 </div>
@@ -478,7 +478,7 @@
                onerror="this.outerHTML='<div style=\'background:linear-gradient(135deg,#1a1a2e,#2c2c4e);border-radius:4px;padding:28px;\'><p style=\'font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;\'>Reach 50,000+ Daily Readers</p></div>'">
           <div class="ad-mid-cta">
             <p>Premium placements available · <strong>Contact our advertising team today</strong></p>
-            <a href="/cdn-cgi/l/email-protection#b8c8ddd7c8d4ddcbdcd9d1d4c1d6ddcfcbd7d6d4d1d6ddf8dfd5d9d1d496dbd7d587cbcddad2dddbcc85f9dcceddcaccd1cbd1d6df9d8a88fdd6c9cdd1cac19d8a889dfd8a9d80889d818c9d8a88e8ddd7c8d4dd9d8a8fcb9d8a88fcd9d1d4c19d8a88f6ddcfcb9d8a88f7d6d4d1d6dd9edad7dcc185f0ddd4d4d79d8afb9d88f99d88f9f19d8a88cfd7cdd4dc9d8a88d4d1d3dd9d8a88ccd79d8a88d9dcceddcaccd1cbdd9d8a88d7d69d8a88c1d7cdca9d8a88cfdddacbd1ccdd969d8a88e8d4ddd9cbdd9d8a88dfddcc9d8a88d1d69d8a88ccd7cddbd09d8a88cfd1ccd09d8a88d5dd9d8a88ccd79d8a88dcd1cbdbcdcbcb9d8a88d9ced9d1d4d9dad4dd9d8a88d9dcceddcaccd1cbd1d6df9d8a88d7c8ccd1d7d6cb9d8a88d9d6dc9d8a88c8d9dbd3d9dfddcb969d88f99d88f9ecd0d9d6d39d8a88c1d7cd96" class="ad-cta">Get In Touch</a>
+            <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website." class="ad-cta">Get In Touch</a>
           </div>
         </div>
 
@@ -632,13 +632,15 @@
             <li><a href="about.html">About Us</a></li>
             <li><a href="editorial-policy.html">Editorial Policy</a></li>
             <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+            <li><a href="terms-of-use.html">Terms of Use</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h5>Subscribe</h5>
           <ul>
             <li><a href="#newsletter">Daily Newsletter</a></li>
-            <li><a href="mailto:peoplesdailynewsonline@gmail.com">Advertise With Us</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website.">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
@@ -654,11 +656,6 @@
     <div class="container">
       <div class="footer-bottom-inner">
         <span class="footer-copyright">&copy; 2026 People's Daily News Online. All rights reserved.</span>
-        <div class="footer-links">
-          <a href="about.html">Privacy Policy</a>
-          <a href="editorial-policy.html">Terms of Use</a>
-          <a href="contact.html">Corrections</a>
-        </div>
       </div>
     </div>
   </div>
@@ -685,7 +682,7 @@
       <div id="mobile-auth-btn-wrap">
         <a href="signin.html" class="btn btn-outline btn-ghost">Sign In</a>
       </div>
-      <a href="#newsletter" class="btn btn-primary" onclick="toggleMenu()">Subscribe</a>
+      <a href="#newsletter" class="btn btn-ghost" onclick="toggleMenu()">Subscribe</a>
     </li>
   </ul>
 </div>
@@ -707,7 +704,7 @@
      2. supabase-client.js (creates _supabase)
      3. main.js (uses _supabase to fetch & render)
 ════════════════════════════════════════════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/main.js"></script>
 
@@ -838,18 +835,4 @@
         msgEl.innerHTML = '<span style="color:#e74c3c">Something went wrong. Please try again.</span>';
       }
     } else {
-      msgEl.innerHTML = '<span style="color:#27ae60">✓ Subscribed! Thank you for joining.</span>';
-      input.value = '';
-    }
-  }
-
-  document.getElementById('newsletter-email').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') subscribeNewsletter();
-  });
-
-  // Call after all functions are defined
-  checkAuthState();
-</script>
-
-</body>
-</html>
+      msgEl.innerHTML = '<span style="color:#2
