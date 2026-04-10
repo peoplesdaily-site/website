@@ -86,16 +86,29 @@
              onerror="this.outerHTML=\`${placeholderSVG(360)}\`">`
     : placeholderSVG(360);
 
-  // Convert plain text content into paragraphs if needed
-  // (If you store HTML in content, remove this conversion.)
+  // Convert plain text content into paragraphs.
+  // Supports:
+  //   - HTML content (returned as-is)
+  //   - Lines that are bare image URLs (.jpg/.png/.gif/.webp/.jpeg) → rendered as <img>
+  //   - Double-newline separated paragraphs
   function contentToHTML(text) {
     if (!text) return '<p><em>No content available.</em></p>';
     // If content already contains HTML tags, return as-is
     if (/<[a-z][\s\S]*>/i.test(text)) return text;
-    // Otherwise split on double newlines and wrap in <p>
+    // Otherwise split on double newlines and process each block
+    var imageUrlPattern = /^https?:\/\/\S+\.(jpg|jpeg|png|gif|webp)(\?[^\s]*)?$/i;
     return text
       .split(/\n\n+/)
-      .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
+      .map(function(para) {
+        var trimmed = para.trim();
+        if (!trimmed) return '';
+        // A single line that is an image URL → render as image
+        if (!trimmed.includes('\n') && imageUrlPattern.test(trimmed)) {
+          return '<img src="' + trimmed + '" alt="Article image" class="article-img-inline" onerror="this.style.display=\'none\'">';
+        }
+        return '<p>' + trimmed.replace(/\n/g, '<br>') + '</p>';
+      })
+      .filter(function(s) { return s.length > 0; })
       .join('');
   }
 
