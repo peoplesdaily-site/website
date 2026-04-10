@@ -81,10 +81,8 @@
   // ── Build the article HTML ────────────────────────────────
 
   const imageHTML = article.image_url
-    ? `<img src="${article.image_url}" alt="${article.title}"
-             class="article-hero-img"
-             onerror="this.outerHTML=\`${placeholderSVG(360)}\`">`
-    : placeholderSVG(360);
+    ? `<img src="${article.image_url}" alt="${article.title}" class="article-hero-img" onerror="this.style.display='none'">`
+    : '';
 
   // Convert plain text content into paragraphs.
   // Supports:
