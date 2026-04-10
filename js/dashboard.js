@@ -801,9 +801,27 @@ async function loadPageEditor() {
     ? 'about.html'
     : currentPageSlug === 'contact'
       ? 'contact.html'
-      : 'editorial-policy.html';
+      : currentPageSlug === 'privacy-policy'
+        ? 'privacy-policy.html'
+        : currentPageSlug === 'terms-of-use'
+          ? 'terms-of-use.html'
+          : 'editorial-policy.html';
 
-  wrap.innerHTML = `
+  // Tab bar — renders all editable pages so no dashboard HTML change is needed
+  const pageTabs = [
+    { slug: 'about',            label: 'About Us' },
+    { slug: 'editorial-policy', label: 'Editorial Policy' },
+    { slug: 'contact',          label: 'Contact Us' },
+    { slug: 'privacy-policy',   label: 'Privacy Policy' },
+    { slug: 'terms-of-use',     label: 'Terms of Use' },
+  ];
+  const tabBarHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">'
+    + pageTabs.map(function(t) {
+        return '<button class="btn btn-sm page-tab ' + (t.slug === currentPageSlug ? 'btn-primary active' : 'btn-ghost') + '" onclick="switchPageTab(\'' + t.slug + '\', this)">' + t.label + '</button>';
+      }).join('')
+    + '</div>';
+
+  wrap.innerHTML = tabBarHTML + `
     <input type="hidden" id="page-id" value="${escHtml(p.id || '')}">
 
     <div class="form-row full" style="margin-bottom:14px">
