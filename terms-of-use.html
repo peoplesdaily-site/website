@@ -225,12 +225,12 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="index.html#newsletter">Daily Newsletter</a></li>
-            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website.">Advertise With Us</a></li>
+            <li><a href="/cdn-cgi/l/email-protection#3141545e415d54425550585d485f5446425e5f5d585f5471565c50585d1f525e5c0e4244535b5452450c7055475443455842585f56140301785f404458434817535e55480c79545d5d5e14037214030178140301465e445d551403015d585a54140301455e1403015055475443455842541403015e5f140301485e4443140301465453425845541f">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
               Have a tip?<br>
-              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
+              <a href="/cdn-cgi/l/email-protection#f9899c9689959c8a9d98909580979c8e8a96979590979cb99e94989095d79a9694" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="1a6a7f756a767f697e7b737663747f6d6975747673747f5a7d777b737634797577">[email&#160;protected]</span></a>
             </p>
           </div>
         </div>
@@ -262,7 +262,7 @@
     <img src="images/thumbnail (6).png" alt="PDNO"
          style="height:36px;width:auto;object-fit:contain"
          onerror="this.style.display='none'">
-    <button class="close-btn" id="close-menu-btn" aria-label="Close menu">&#x2715;</button>
+    <button class="close-btn" onclick="toggleMenu()" aria-label="Close menu">&#x2715;</button>
   </div>
   <ul class="mobile-nav-list">
     <li><a href="index.html">Home</a></li>
@@ -285,7 +285,7 @@
 </div>
 
 <!-- Scripts -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script>var PAGE_SLUG = 'terms-of-use';</script>
 <script src="js/page.js"></script>
@@ -347,16 +347,4 @@
         if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
         if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>';
       } else {
-        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
-        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button>';
-      }
-    } catch(e) {}
-  }
-  async function signOutUser() {
-    await _supabase.auth.signOut();
-    window.location.reload();
-  }
-  checkAuthState();
-</script>
-</body>
-</html>
+        if (wr
