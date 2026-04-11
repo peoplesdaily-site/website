@@ -319,12 +319,12 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="index.html#newsletter">Daily Newsletter</a></li>
-            <li><a href="/cdn-cgi/l/email-protection#9bebfef4ebf7fee8fffaf2f7e2f5feece8f4f5f7f2f5fedbfcf6faf2f7b5f8f4f6a4e8eef9f1fef8efa6daffedfee9eff2e8f2f5fcbea9abd2f5eaeef2e9e2bdf9f4ffe2a6d3fef7f7f4bea9d8bea9abd2bea9abecf4eef7ffbea9abf7f2f0febea9abeff4bea9abfaffedfee9eff2e8febea9abf4f5bea9abe2f4eee9bea9abecfef9e8f2effeb5">Advertise With Us</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website.">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
               Have a tip?<br>
-              <a href="/cdn-cgi/l/email-protection#87f7e2e8f7ebe2f4e3e6eeebfee9e2f0f4e8e9ebeee9e2c7e0eae6eeeba9e4e8ea" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="adddc8c2ddc1c8dec9ccc4c1d4c3c8dadec2c3c1c4c3c8edcac0ccc4c183cec2c0">[email&#160;protected]</span></a>
+              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
             </p>
           </div>
         </div>
@@ -437,11 +437,10 @@
         if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
         if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>';
       } else {
-        if (wr
-      p) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
-      if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button>';
-    }
-  } catch(e) {}
+        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
+        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button>';
+      }
+    } catch(e) {}
   }
   async function signOutUser() {
     await _supabase.auth.signOut();
