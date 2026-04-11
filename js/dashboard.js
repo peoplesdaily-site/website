@@ -561,6 +561,39 @@ async function loadSettings() {
           <input type="text" id="sett-hero-subtitle" value="${escHtml(s.hero_subtitle || '')}" placeholder="Short tagline shown below the hero title">
         </div>
       </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:20px;margin-bottom:20px">
+        <p style="font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:16px">Advertisement Banners</p>
+        <div class="form-row full" style="margin-bottom:14px">
+          <div class="form-group">
+            <label>Top Banner Image URL</label>
+            <input type="url" id="sett-ad-top" value="${escHtml(s.ad_top_url || '')}" placeholder="https://… or images/thumbnail (1500 x 500 px).png">
+            <span class="form-hint">Shown in the top ad strip below the header (1500×500px recommended)</span>
+          </div>
+        </div>
+        <div class="form-row full" style="margin-bottom:14px">
+          <div class="form-group">
+            <label>Mid-Page Banner Image URL</label>
+            <input type="url" id="sett-ad-mid" value="${escHtml(s.ad_mid_url || '')}" placeholder="https://… or images/thumbnail (1500 x 500 px).png">
+            <span class="form-hint">Shown in the mid-page ad block between Politics and Business sections</span>
+          </div>
+        </div>
+        <div class="form-row full" style="margin-bottom:14px">
+          <div class="form-group">
+            <label>Sidebar Ad 1 Image URL</label>
+            <input type="url" id="sett-ad-sidebar1" value="${escHtml(s.ad_sidebar1_url || '')}" placeholder="https://…">
+            <span class="form-hint">Shown in the right sidebar (first slot)</span>
+          </div>
+        </div>
+        <div class="form-row full" style="margin-bottom:24px">
+          <div class="form-group">
+            <label>Sidebar Ad 2 Image URL</label>
+            <input type="url" id="sett-ad-sidebar2" value="${escHtml(s.ad_sidebar2_url || '')}" placeholder="https://…">
+            <span class="form-hint">Shown in the right sidebar (second slot)</span>
+          </div>
+        </div>
+      </div>
+
       <button class="btn btn-primary" onclick="saveSettings('${s.id || ''}')">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         Save Settings
@@ -571,11 +604,15 @@ async function loadSettings() {
 
 async function saveSettings(existingId) {
   const payload = {
-    site_name:     document.getElementById('sett-site-name').value.trim(),
-    logo_url:      document.getElementById('sett-logo-url').value.trim() || null,
-    hero_title:    document.getElementById('sett-hero-title').value.trim() || null,
-    hero_subtitle: document.getElementById('sett-hero-subtitle').value.trim() || null,
-    updated_at:    new Date().toISOString(),
+    site_name:       document.getElementById('sett-site-name').value.trim(),
+    logo_url:        document.getElementById('sett-logo-url').value.trim() || null,
+    hero_title:      document.getElementById('sett-hero-title').value.trim() || null,
+    hero_subtitle:   document.getElementById('sett-hero-subtitle').value.trim() || null,
+    ad_top_url:      document.getElementById('sett-ad-top').value.trim() || null,
+    ad_mid_url:      document.getElementById('sett-ad-mid').value.trim() || null,
+    ad_sidebar1_url: document.getElementById('sett-ad-sidebar1').value.trim() || null,
+    ad_sidebar2_url: document.getElementById('sett-ad-sidebar2').value.trim() || null,
+    updated_at:      new Date().toISOString(),
   };
 
   let error;
