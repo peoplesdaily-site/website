@@ -167,7 +167,7 @@
         <li><a href="index.html#opinion">Opinion</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
-      <button class="hamburger" id="hamburger-btn" aria-label="Menu">
+      <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -225,12 +225,12 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="index.html#newsletter">Daily Newsletter</a></li>
-            <li><a href="/cdn-cgi/l/email-protection#8efeebe1fee2ebfdeaefe7e2f7e0ebf9fde1e0e2e7e0ebcee9e3efe7e2a0ede1e3b1fdfbece4ebedfab3cfeaf8ebfcfae7fde7e0e9abbcbec7e0fffbe7fcf7a8ece1eaf7b3c6ebe2e2e1abbccdabbcbec7abbcbef9e1fbe2eaabbcbee2e7e5ebabbcbefae1abbcbeefeaf8ebfcfae7fdebabbcbee1e0abbcbef7e1fbfcabbcbef9ebecfde7faeba0">Advertise With Us</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website.">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
               Have a tip?<br>
-              <a href="/cdn-cgi/l/email-protection#a8d8cdc7d8c4cddbccc9c1c4d1c6cddfdbc7c6c4c1c6cde8cfc5c9c1c486cbc7c5" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="c1b1a4aeb1ada4b2a5a0a8adb8afa4b6b2aeafada8afa481a6aca0a8adefa2aeac">[email&#160;protected]</span></a>
+              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
             </p>
           </div>
         </div>
@@ -317,8 +317,7 @@
     m.classList.toggle('open');
     document.body.style.overflow = m.classList.contains('open') ? 'hidden' : '';
   }
-  document.getElementById('hamburger-btn').addEventListener('click', toggleMenu);
-  document.getElementById('close-menu-btn').addEventListener('click', toggleMenu);
+
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       document.getElementById('searchOverlay').classList.remove('open');
@@ -335,8 +334,7 @@
       var wrap       = document.getElementById('auth-btn-wrap');
       var mobileWrap = document.getElementById('mobile-auth-btn-wrap');
       if (!session) {
-        var btn = '<a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
-        if (wrap) wrap.innerHTML = btn;
+        if (wrap) wrap.innerHTML = '<a href="signin.html" class="btn btn-outline" style="display:inline-block">Sign In</a>';
         if (mobileWrap) mobileWrap.innerHTML = '<a href="signin.html" class="btn btn-ghost">Sign In</a>';
         return;
       }
