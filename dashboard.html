@@ -665,16 +665,7 @@
             <span style="font-size:11px;color:var(--text-muted)">Changes go live on the website instantly</span>
           </div>
           <div class="dash-panel-body">
-            <!-- Tab selector -->
-            <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-              <button class="btn btn-primary btn-sm page-tab active"
-                      onclick="switchPageTab('about',this)">About Us</button>
-              <button class="btn btn-ghost btn-sm page-tab"
-                      onclick="switchPageTab('editorial-policy',this)">Editorial Policy</button>
-              <button class="btn btn-ghost btn-sm page-tab"
-                      onclick="switchPageTab('contact',this)">Contact Us</button>
-            </div>
-            <!-- Editor filled by JS -->
+            <!-- Tabs injected dynamically by loadPageEditor() in dashboard.js -->
             <div id="page-editor-wrap"><div class="spinner"></div></div>
           </div>
         </div>
