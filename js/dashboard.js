@@ -112,6 +112,7 @@ const viewTitles = {
   'view-articles':     'All Articles',
   'view-new':          'New Article',
   'view-settings':     'Site Settings',
+  'view-ad-settings':  'Ad Settings',
   'view-pages':        'Edit Pages',
   'view-subscribers':  'Newsletter Subscribers',
 };
@@ -133,6 +134,7 @@ function showView(id) {
   if (id === 'view-overview')     loadOverview();
   if (id === 'view-articles')     loadArticlesTable();
   if (id === 'view-settings')     loadSettings();
+  if (id === 'view-ad-settings')  loadAdSettings();
   if (id === 'view-pages')        loadPageEditor();
   if (id === 'view-subscribers')  loadSubscribers();
 }
@@ -561,39 +563,6 @@ async function loadSettings() {
           <input type="text" id="sett-hero-subtitle" value="${escHtml(s.hero_subtitle || '')}" placeholder="Short tagline shown below the hero title">
         </div>
       </div>
-
-      <div style="border-top:1px solid var(--border);padding-top:20px;margin-bottom:20px">
-        <p style="font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:16px">Advertisement Banners</p>
-        <div class="form-row full" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Top Banner Image URL</label>
-            <input type="url" id="sett-ad-top" value="${escHtml(s.ad_top_url || '')}" placeholder="https://… or images/thumbnail (1500 x 500 px).png">
-            <span class="form-hint">Shown in the top ad strip below the header (1500×500px recommended)</span>
-          </div>
-        </div>
-        <div class="form-row full" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Mid-Page Banner Image URL</label>
-            <input type="url" id="sett-ad-mid" value="${escHtml(s.ad_mid_url || '')}" placeholder="https://… or images/thumbnail (1500 x 500 px).png">
-            <span class="form-hint">Shown in the mid-page ad block between Politics and Business sections</span>
-          </div>
-        </div>
-        <div class="form-row full" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Sidebar Ad 1 Image URL</label>
-            <input type="url" id="sett-ad-sidebar1" value="${escHtml(s.ad_sidebar1_url || '')}" placeholder="https://…">
-            <span class="form-hint">Shown in the right sidebar (first slot)</span>
-          </div>
-        </div>
-        <div class="form-row full" style="margin-bottom:24px">
-          <div class="form-group">
-            <label>Sidebar Ad 2 Image URL</label>
-            <input type="url" id="sett-ad-sidebar2" value="${escHtml(s.ad_sidebar2_url || '')}" placeholder="https://…">
-            <span class="form-hint">Shown in the right sidebar (second slot)</span>
-          </div>
-        </div>
-      </div>
-
       <button class="btn btn-primary" onclick="saveSettings('${s.id || ''}')">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         Save Settings
@@ -604,15 +573,11 @@ async function loadSettings() {
 
 async function saveSettings(existingId) {
   const payload = {
-    site_name:       document.getElementById('sett-site-name').value.trim(),
-    logo_url:        document.getElementById('sett-logo-url').value.trim() || null,
-    hero_title:      document.getElementById('sett-hero-title').value.trim() || null,
-    hero_subtitle:   document.getElementById('sett-hero-subtitle').value.trim() || null,
-    ad_top_url:      document.getElementById('sett-ad-top').value.trim() || null,
-    ad_mid_url:      document.getElementById('sett-ad-mid').value.trim() || null,
-    ad_sidebar1_url: document.getElementById('sett-ad-sidebar1').value.trim() || null,
-    ad_sidebar2_url: document.getElementById('sett-ad-sidebar2').value.trim() || null,
-    updated_at:      new Date().toISOString(),
+    site_name:     document.getElementById('sett-site-name').value.trim(),
+    logo_url:      document.getElementById('sett-logo-url').value.trim() || null,
+    hero_title:    document.getElementById('sett-hero-title').value.trim() || null,
+    hero_subtitle: document.getElementById('sett-hero-subtitle').value.trim() || null,
+    updated_at:    new Date().toISOString(),
   };
 
   let error;
@@ -629,8 +594,144 @@ async function saveSettings(existingId) {
 }
 
 // ══════════════════════════════════════════════════════════
-// TOAST NOTIFICATIONS
+// AD SETTINGS
 // ══════════════════════════════════════════════════════════
+
+async function loadAdSettings() {
+  const wrap = document.getElementById('ad-settings-wrap');
+  wrap.innerHTML = '<div class="spinner"></div>';
+
+  const { data, error } = await _supabase
+    .from('site_settings')
+    .select('*')
+    .limit(1)
+    .single();
+
+  const s = data || {};
+
+  wrap.innerHTML = `
+    <div style="max-width:640px">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">
+        Upload an image to Supabase Storage and paste its public URL here, or paste any publicly accessible image URL.
+        This replaces the <code style="background:var(--bg);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:12px">images/thumbnail (1500 x 500 px).png</code> ad banner used across the site.
+      </p>
+
+      <!-- Slot 1: Masthead / Top Banner -->
+      <div class="form-group" style="margin-bottom:20px">
+        <label>Top Banner Ad URL <span style="font-weight:400;color:var(--text-muted)">(masthead &amp; hero strip — 1500×500px recommended)</span></label>
+        <input type="url" id="ad-banner-url"
+               value="${escHtml(s.ad_banner_url || '')}"
+               placeholder="https://…/your-banner.jpg">
+      </div>
+
+      <!-- Preview -->
+      <div id="ad-preview-wrap" style="margin-bottom:20px;display:${s.ad_banner_url ? 'block' : 'none'}">
+        <label style="margin-bottom:8px;display:block">Preview</label>
+        <img id="ad-preview-img"
+             src="${escHtml(s.ad_banner_url || '')}"
+             alt="Ad preview"
+             style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border);"
+             onerror="this.style.display='none'">
+      </div>
+
+      <!-- Upload from device -->
+      <div style="margin-bottom:24px;padding:16px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius)">
+        <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px;display:block">Upload Image to Supabase Storage</label>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <input type="file" id="ad-file-input" accept="image/*"
+                 style="font-size:13px;color:var(--text)" onchange="handleAdFileSelect(this)">
+          <button class="btn btn-ghost btn-sm" onclick="uploadAdImage()" id="ad-upload-btn" style="display:none">
+            Upload &amp; Use This Image
+          </button>
+        </div>
+        <p id="ad-upload-status" style="font-size:12px;color:var(--text-muted);margin-top:8px"></p>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveAdSettings('${escHtml(s.id || '')}')">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Ad Settings
+      </button>
+    </div>
+  `;
+
+  // Live URL preview
+  document.getElementById('ad-banner-url').addEventListener('input', function() {
+    const url = this.value.trim();
+    const wrap2 = document.getElementById('ad-preview-wrap');
+    const img   = document.getElementById('ad-preview-img');
+    if (url) {
+      wrap2.style.display = 'block';
+      img.style.display = 'block';
+      img.src = url;
+    } else {
+      wrap2.style.display = 'none';
+    }
+  });
+}
+
+function handleAdFileSelect(input) {
+  const btn = document.getElementById('ad-upload-btn');
+  btn.style.display = input.files && input.files.length ? 'inline-flex' : 'none';
+}
+
+async function uploadAdImage() {
+  const input  = document.getElementById('ad-file-input');
+  const status = document.getElementById('ad-upload-status');
+  const btn    = document.getElementById('ad-upload-btn');
+
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const ext  = file.name.split('.').pop();
+  const path = `ads/banner-${Date.now()}.${ext}`;
+
+  btn.textContent = 'Uploading…';
+  btn.disabled = true;
+  status.textContent = 'Uploading to Supabase Storage…';
+
+  const { data: upData, error: upErr } = await _supabase.storage
+    .from('site-assets')
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if (upErr) {
+    status.innerHTML = '<span style="color:var(--accent)">Upload failed: ' + upErr.message + '. Make sure a public bucket named <strong>site-assets</strong> exists in your Supabase Storage.</span>';
+    btn.textContent = 'Upload & Use This Image';
+    btn.disabled = false;
+    return;
+  }
+
+  const { data: urlData } = _supabase.storage.from('site-assets').getPublicUrl(path);
+  const publicUrl = urlData.publicUrl;
+
+  document.getElementById('ad-banner-url').value = publicUrl;
+  const img = document.getElementById('ad-preview-img');
+  img.src = publicUrl;
+  img.style.display = 'block';
+  document.getElementById('ad-preview-wrap').style.display = 'block';
+
+  status.innerHTML = '<span style="color:var(--green)">✓ Uploaded! Click <strong>Save Ad Settings</strong> to apply.</span>';
+  btn.textContent = 'Upload & Use This Image';
+  btn.disabled = false;
+}
+
+async function saveAdSettings(existingId) {
+  const url = document.getElementById('ad-banner-url').value.trim();
+
+  const payload = { ad_banner_url: url || null, updated_at: new Date().toISOString() };
+
+  let error;
+  if (existingId) {
+    const res = await _supabase.from('site_settings').update(payload).eq('id', existingId);
+    error = res.error;
+  } else {
+    const res = await _supabase.from('site_settings').insert([payload]);
+    error = res.error;
+  }
+
+  if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+  toast('Ad settings saved! The banner URL is now active.', 'success');
+}
+
+
 
 let toastTimer;
 function toast(msg, type) {
