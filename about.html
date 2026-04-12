@@ -108,6 +108,9 @@
     .mobile-nav-list .nav-dashboard a{color:var(--gold)}
     .mobile-menu-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:10px;flex-wrap:wrap}
 
+
+    .masthead-ad-slot { display: flex; align-items: center; justify-content: center; }
+    .masthead-ad-slot img { max-height: 80px; width: auto; border-radius: var(--radius); }
     @media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:28px}}
     @media(max-width:700px){.nav-list{display:none}.hamburger{display:flex}.footer-grid{grid-template-columns:1fr}}
     @media(max-width:480px){h1#page-title{font-size:28px}.masthead-actions{gap:6px}.masthead-actions .btn{padding:6px 10px;font-size:10px;letter-spacing:0.5px}.search-btn{padding:5px}}
@@ -137,7 +140,13 @@
         <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="logo-img"
              onerror="this.style.display='none'">
       </a>
-      <div></div>
+      <div class="masthead-ad-slot">
+        <div>
+          <div class="ad-label">Advertisement</div>
+          <img src="images/thumbnail (1500 x 500 px).png" alt="Ad Banner"
+               onerror="this.style.display='none'">
+        </div>
+      </div>
       <div class="masthead-actions">
         <button class="search-btn" onclick="toggleSearch()" aria-label="Search">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -225,12 +234,12 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="index.html#newsletter">Daily Newsletter</a></li>
-            <li><a href="/cdn-cgi/l/email-protection#b7c7d2d8c7dbd2c4d3d6dedbced9d2c0c4d8d9dbded9d2f7d0dad6dedb99d4d8da88c4c2d5ddd2d4c38af6d3c1d2c5c3dec4ded9d0928587fed9c6c2dec5ce91d5d8d3ce8affd2dbdbd89285f4928587fe928587c0d8c2dbd3928587dbdedcd2928587c3d8928587d6d3c1d2c5c3dec4d2928587d8d9928587ced8c2c5928587c0d2d5c4dec3d299">Advertise With Us</a></li>
+                        <li><a href="mailto:peoplesdailynewsonline@gmail.com">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
-              Have a tip?<br>
-              <a href="/cdn-cgi/l/email-protection#c7b7a2a8b7aba2b4a3a6aeabbea9a2b0b4a8a9abaea9a287a0aaa6aeabe9a4a8aa" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="5424313b2438312730353d382d3a3123273b3a383d3a31143339353d387a373b39">[email&#160;protected]</span></a>
+                            Have a tip?<br>
+              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
             </p>
           </div>
         </div>
@@ -262,7 +271,7 @@
     <img src="images/thumbnail (6).png" alt="PDNO"
          style="height:36px;width:auto;object-fit:contain"
          onerror="this.style.display='none'">
-    <button class="close-btn" onclick="toggleMenu()" aria-label="Close menu">&#x2715;</button>
+    <button class="close-btn" id="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu"><button class="close-btn" id="close-menu-btn" aria-label="Close menu">&#x2715;</button>#x2715;</button>
   </div>
   <ul class="mobile-nav-list">
     <li><a href="index.html">Home</a></li>
@@ -285,7 +294,7 @@
 </div>
 
 <!-- Scripts -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script>var PAGE_SLUG = 'about';</script>
 <script src="js/page.js"></script>
@@ -347,4 +356,4 @@
         if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
         if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>';
       } else {
-        if (wr
+        if (wra
