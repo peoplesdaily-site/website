@@ -397,7 +397,7 @@
            onerror="this.parentElement.innerHTML='<div style=\'font-family:var(--font-ui);font-size:13px;color:var(--text-muted);padding:20px 0;\'>📢 <strong>Advertise With Us</strong> — Reach thousands of daily readers.</div>'">
     </div>
     <div class="ad-cta-wrap">
-      <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website." class="ad-cta">Advertise With Us</a>
+      <a href="mailto:peoplesdailynewsonline@gmail.com" class="ad-cta">Advertise With Us</a>
     </div>
   </div>
 </div>
@@ -480,7 +480,7 @@
           <img src="images/thumbnail (1500 x 500 px).png" alt="Advertisement Banner"
                onerror="this.outerHTML='<div style=\'background:linear-gradient(135deg,#1a1a2e,#2c2c4e);border-radius:4px;padding:28px;\'><p style=\'font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;\'>Reach 50,000+ Daily Readers</p></div>'">
           <div class="ad-mid-cta">
-            <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website." class="ad-cta">Advertise With Us</a>
+            <a href="mailto:peoplesdailynewsonline@gmail.com" class="ad-cta">Advertise With Us</a>
           </div>
         </div>
 
@@ -543,16 +543,16 @@
         </div>
 
         <div class="sidebar-ad">
-          <img src="images/ad-sidebar-1.png" alt="Advertisement"
-               style="width:100%;display:block"
-               onerror="this.style.display='none'">
+          <div class="img-placeholder" style="height:250px">
+            <svg viewBox="0 0 48 48" fill="none" width="40" height="40"><rect x="4" y="4" width="40" height="40" rx="4" stroke="#bbb" stroke-width="2"/></svg>
+          </div>
           <div class="sidebar-ad-label">Advertisement · Advertise Here</div>
         </div>
 
         <div class="sidebar-ad">
-          <img src="images/ad-sidebar-2.png" alt="Advertisement"
-               style="width:100%;display:block"
-               onerror="this.style.display='none'">
+          <div class="img-placeholder" style="height:250px" id="sidebar-ad-2">
+            <svg viewBox="0 0 48 48" fill="none" width="40" height="40"><rect x="4" y="4" width="40" height="40" rx="4" stroke="#bbb" stroke-width="2"/></svg>
+          </div>
           <div class="sidebar-ad-label">Advertisement · Advertise Here</div>
         </div>
       </aside>
@@ -649,7 +649,7 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="#newsletter">Daily Newsletter</a></li>
-            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website.">Advertise With Us</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
@@ -713,7 +713,7 @@
      2. supabase-client.js (creates _supabase)
      3. main.js (uses _supabase to fetch & render)
 ════════════════════════════════════════════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/main.js"></script>
 
@@ -856,6 +856,18 @@
   _supabase.auth.onAuthStateChange(function() {
     checkAuthState();
   });
+
+  // ── Apply dynamic ad banner from site_settings ────────────
+  (async function() {
+    try {
+      var { data } = await _supabase.from('site_settings').select('ad_banner_url').limit(1).single();
+      if (data && data.ad_banner_url) {
+        document.querySelectorAll('img[src="images/thumbnail (1500 x 500 px).png"]').forEach(function(img) {
+          img.src = data.ad_banner_url;
+        });
+      }
+    } catch(e) {}
+  })();
 
 </script>
 </body>
