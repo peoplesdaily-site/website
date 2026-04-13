@@ -194,7 +194,7 @@
       .article-nav{grid-template-columns:1fr}
     }
     @media(max-width:480px){
-      .masthead-inner{grid-template-columns:1fr auto}
+      .masthead-inner{grid-template-columns:auto 1fr auto}
       .logo-img{height:80px}
       .masthead-actions{gap:6px}
       .masthead-actions .btn{padding:6px 10px;font-size:10px;letter-spacing:0.5px}
@@ -319,12 +319,12 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="index.html#newsletter">Daily Newsletter</a></li>
-            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website.">Advertise With Us</a></li>
+            <li><a href="/cdn-cgi/l/email-protection#0272676d726e677166636b6e7b6c6775716d6c6e6b6c6742656f636b6e2c616d6f3d717760686761763f4366746770766b716b6c652730324b6c73776b707b24606d667b3f4a676e6e6d2730412730324b273032756d776e662730326e6b6967273032766d2730326366746770766b71672730326d6c2730327b6d7770273032756760716b76672c">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
               Have a tip?<br>
-              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
+              <a href="/cdn-cgi/l/email-protection#a4d4c1cbd4c8c1d7c0c5cdc8ddcac1d3d7cbcac8cdcac1e4c3c9c5cdc88ac7cbc9" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="f8889d9788949d8b9c99919481969d8f8b97969491969db89f95999194d69b9795">[email&#160;protected]</span></a>
             </p>
           </div>
         </div>
@@ -376,7 +376,7 @@
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/article.js"></script>
 
@@ -437,16 +437,4 @@
         if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button> <a href="dashboard.html" class="btn btn-outline" style="display:inline-block">Dashboard</a>';
         if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button> <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>';
       } else {
-        if (wrap) wrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-outline" style="display:inline-block">Sign Out</button>';
-        if (mobileWrap) mobileWrap.innerHTML = '<button onclick="signOutUser()" class="btn btn-ghost">Sign Out</button>';
-      }
-    } catch(e) {}
-  }
-  async function signOutUser() {
-    await _supabase.auth.signOut();
-    window.location.reload();
-  }
-  checkAuthState();
-</script>
-</body>
-</html>
+        if (wr
