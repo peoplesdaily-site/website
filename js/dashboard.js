@@ -112,6 +112,7 @@ const viewTitles = {
   'view-articles':     'All Articles',
   'view-new':          'New Article',
   'view-settings':     'Site Settings',
+  'view-ads':          'Advertisement Banners',
   'view-pages':        'Edit Pages',
   'view-subscribers':  'Newsletter Subscribers',
 };
@@ -133,6 +134,7 @@ function showView(id) {
   if (id === 'view-overview')     loadOverview();
   if (id === 'view-articles')     loadArticlesTable();
   if (id === 'view-settings')     loadSettings();
+  if (id === 'view-ads')          loadAds();
   if (id === 'view-pages')        loadPageEditor();
   if (id === 'view-subscribers')  loadSubscribers();
 }
@@ -589,6 +591,99 @@ async function saveSettings(existingId) {
 
   if (error) { toast('Save failed: ' + error.message, 'error'); return; }
   toast('Settings saved!', 'success');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// ADS MANAGER
+// Edit the 4 ad image slots on the homepage
+// ══════════════════════════════════════════════════════════
+
+async function loadAds() {
+  const wrap = document.getElementById('ads-form-wrap');
+
+  const { data, error } = await _supabase
+    .from('site_settings')
+    .select('*')
+    .limit(1)
+    .single();
+
+  const s = (error && error.code === 'PGRST116') ? {} : (data || {});
+  const sid = s.id || '';
+
+  wrap.innerHTML = `
+    <div style="max-width:640px">
+      <p style="font-family:var(--font-ui);font-size:12px;color:var(--text-muted);margin-bottom:20px;line-height:1.6">
+        Paste a public image URL for each ad slot. The image will appear immediately on the homepage.
+        Leave blank to show the default placeholder.
+      </p>
+
+      <div class="form-row full" style="margin-bottom:18px">
+        <div class="form-group">
+          <label>Top Banner (below header, full-width)</label>
+          <input type="url" id="ad-top-url" value="${escHtml(s.ad_top_url || '')}" placeholder="https://… (1500×500px recommended)">
+          <span class="form-hint">Shown in the wide banner strip below the navigation bar</span>
+        </div>
+      </div>
+
+      <div class="form-row full" style="margin-bottom:18px">
+        <div class="form-group">
+          <label>Mid-Page Banner (between Politics & Business)</label>
+          <input type="url" id="ad-mid-url" value="${escHtml(s.ad_mid_url || '')}" placeholder="https://… (1500×500px recommended)">
+          <span class="form-hint">Shown in the content area between sections</span>
+        </div>
+      </div>
+
+      <div class="form-row full" style="margin-bottom:18px">
+        <div class="form-group">
+          <label>Sidebar Ad 1 (right column, first slot)</label>
+          <input type="url" id="ad-sidebar1-url" value="${escHtml(s.ad_sidebar1_url || '')}" placeholder="https://… (300×250px recommended)">
+        </div>
+      </div>
+
+      <div class="form-row full" style="margin-bottom:24px">
+        <div class="form-group">
+          <label>Sidebar Ad 2 (right column, second slot)</label>
+          <input type="url" id="ad-sidebar2-url" value="${escHtml(s.ad_sidebar2_url || '')}" placeholder="https://… (300×250px recommended)">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveAds('${sid}')">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Ad Settings
+      </button>
+      <div id="ads-save-msg" style="margin-top:10px;font-size:12px;font-family:var(--font-ui);min-height:16px"></div>
+    </div>
+  `;
+}
+
+async function saveAds(existingId) {
+  const msgEl = document.getElementById('ads-save-msg');
+  const payload = {
+    ad_top_url:      document.getElementById('ad-top-url').value.trim() || null,
+    ad_mid_url:      document.getElementById('ad-mid-url').value.trim() || null,
+    ad_sidebar1_url: document.getElementById('ad-sidebar1-url').value.trim() || null,
+    ad_sidebar2_url: document.getElementById('ad-sidebar2-url').value.trim() || null,
+    updated_at:      new Date().toISOString(),
+  };
+
+  let error;
+  if (existingId) {
+    const res = await _supabase.from('site_settings').update(payload).eq('id', existingId);
+    error = res.error;
+  } else {
+    const res = await _supabase.from('site_settings').insert([payload]);
+    error = res.error;
+  }
+
+  if (error) {
+    msgEl.innerHTML = '<span style="color:var(--accent)">Save failed: ' + error.message + '</span>';
+    toast('Save failed: ' + error.message, 'error');
+    return;
+  }
+  msgEl.innerHTML = '<span style="color:var(--green)">✓ Ad settings saved!</span>';
+  toast('Ad settings saved!', 'success');
+  setTimeout(loadAds, 600);
 }
 
 // ══════════════════════════════════════════════════════════
