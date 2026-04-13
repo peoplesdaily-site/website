@@ -344,13 +344,7 @@
         <img src="images/thumbnail (6).png" alt="People's Daily News Online" class="logo-img"
              onerror="this.style.display='none'">
       </a>
-      <div class="masthead-ad-slot">
-        <div>
-          <div class="ad-label">Advertisement</div>
-          <img src="images/thumbnail (1500 x 500 px).png" alt="Ad Banner"
-               onerror="this.style.display='none'">
-        </div>
-      </div>
+      <div></div>
       <div class="masthead-actions">
         <button class="search-btn" onclick="toggleSearch()" aria-label="Search">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -393,11 +387,11 @@
   <div class="container">
     <div class="ad-label">Advertisement</div>
     <div class="ad-banner-top-inner">
-      <img src="images/thumbnail (1500 x 500 px).png" alt="Advertise with us"
+      <img id="ad-top-img" src="images/thumbnail (1500 x 500 px).png" alt="Advertise with us"
            onerror="this.parentElement.innerHTML='<div style=\'font-family:var(--font-ui);font-size:13px;color:var(--text-muted);padding:20px 0;\'>📢 <strong>Advertise With Us</strong> — Reach thousands of daily readers.</div>'">
     </div>
     <div class="ad-cta-wrap">
-      <a href="/cdn-cgi/l/email-protection#3343565c435f564057525a5f4a5d5644405c5d5f5a5d5673545e525a5f1d505c5e0c404651595650470e7257455641475a405a5d541601037a5d42465a414a15515c574a0e7b565f5f5c1601701601037a160103445c465f571601035f5a5856160103475c1601035257455641475a40561601035c5d1601034a5c4641160103445651405a47561d" class="ad-cta">Advertise With Us</a>
+      <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website." class="ad-cta">Advertise With Us</a>
     </div>
   </div>
 </div>
@@ -477,11 +471,10 @@
         <!-- AD MID -->
         <div class="ad-mid">
           <div class="ad-label">Advertisement — Advertise With Us</div>
-          <img src="images/thumbnail (1500 x 500 px).png" alt="Advertisement Banner"
+          <img id="ad-mid-img" src="images/thumbnail (1500 x 500 px).png" alt="Advertisement Banner"
                onerror="this.outerHTML='<div style=\'background:linear-gradient(135deg,#1a1a2e,#2c2c4e);border-radius:4px;padding:28px;\'><p style=\'font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;\'>Reach 50,000+ Daily Readers</p></div>'">
           <div class="ad-mid-cta">
-            <p>Premium placements available · <strong>Contact our advertising team today</strong></p>
-            <a href="/cdn-cgi/l/email-protection#0d7d68627d61687e696c64617463687a7e6263616463684d6a606c6461236e6260327e786f67686e79304c697b687f79647e64636a283f3d44637c78647f742b6f626974304568616162283f4e283f3d44283f3d7a62786169283f3d61646668283f3d7962283f3d6c697b687f79647e68283f3d6263283f3d7462787f283f3d7a686f7e64796823" class="ad-cta">Get In Touch</a>
+            <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website." class="ad-cta">Advertise With Us</a>
           </div>
         </div>
 
@@ -543,10 +536,20 @@
           </div>
         </div>
 
-        <div class="sidebar-ad">
-          <div class="img-placeholder" style="height:250px">
-            <svg viewBox="0 0 48 48" fill="none" width="40" height="40"><rect x="4" y="4" width="40" height="40" rx="4" stroke="#bbb" stroke-width="2"/></svg>
-          </div>
+        <div class="sidebar-ad" id="sidebar-ad-1-wrap">
+          <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website." id="sidebar-ad-1-link">
+            <img id="sidebar-ad-1-img" src="images/thumbnail (1500 x 500 px).png" alt="Advertisement"
+                 style="width:100%;display:block"
+                 onerror="this.style.display='none'">
+          </a>
+          <div class="sidebar-ad-label">Advertisement · Advertise Here</div>
+        </div>
+
+        <div class="sidebar-ad" id="sidebar-ad-2-wrap" style="margin-top:16px">
+          <a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website." id="sidebar-ad-2-link">
+            <img id="sidebar-ad-2-img" src="" alt="Advertisement"
+                 style="width:100%;display:none">
+          </a>
           <div class="sidebar-ad-label">Advertisement · Advertise Here</div>
         </div>
       </aside>
@@ -643,12 +646,12 @@
           <h5>Subscribe</h5>
           <ul>
             <li><a href="#newsletter">Daily Newsletter</a></li>
-            <li><a href="/cdn-cgi/l/email-protection#f181949e819d94829590989d889f9486829e9f9d989f94b1969c90989ddf929e9cce8284939b949285ccb095879483859882989f96d4c3c1b89f8084988388d7939e9588ccb9949d9d9ed4c3b2d4c3c1b8d4c3c1869e849d95d4c3c19d989a94d4c3c1859ed4c3c1909587948385988294d4c3c19e9fd4c3c1889e8483d4c3c186949382988594df">Advertise With Us</a></li>
+            <li><a href="mailto:peoplesdailynewsonline@gmail.com?subject=Advertising%20Inquiry&body=Hello%2C%20I%20would%20like%20to%20advertise%20on%20your%20website.">Advertise With Us</a></li>
           </ul>
           <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
             <p style="font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
               Have a tip?<br>
-              <a href="/cdn-cgi/l/email-protection#3d4d58524d51584e595c54514453584a4e5253515453587d5a505c5451135e5250" style="color:#7ba4d4;font-weight:600"><span class="__cf_email__" data-cfemail="19697c7669757c6a7d78707560777c6e6a76777570777c597e74787075377a7674">[email&#160;protected]</span></a>
+              <a href="mailto:peoplesdailynewsonline@gmail.com" style="color:#7ba4d4;font-weight:600">peoplesdailynewsonline@gmail.com</a>
             </p>
           </div>
         </div>
@@ -707,7 +710,7 @@
      2. supabase-client.js (creates _supabase)
      3. main.js (uses _supabase to fetch & render)
 ════════════════════════════════════════════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/main.js"></script>
 
