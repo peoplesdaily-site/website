@@ -1,4 +1,4 @@
-// ============================================================
+// ===========================================================
 // js/page.js
 // Shared script for About Us, Editorial Policy, Contact Us.
 // Fetches content from public.pages in Supabase and renders it.
@@ -11,7 +11,7 @@
 //   <h1 id="page-title"></h1>
 //   <div id="page-content"></div>
 //   <div id="page-updated"></div>
-// ============================================================
+// ===========================================================
 
 (async function () {
 
