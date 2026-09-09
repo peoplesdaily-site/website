@@ -1,9 +1,9 @@
-// ============================================================
+// ===========================================================
 // js/article.js
 // Reads the ?slug= query parameter, fetches the matching
 // article from Supabase, and renders it into article.html.
 // Also loads related articles in the sidebar.
-// ============================================================
+// ===========================================================
 
 (async function () {
 
