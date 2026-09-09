@@ -1,10 +1,10 @@
-// ============================================================
+// ===========================================================
 // js/main.js
 // Homepage data layer.
 // Fetches published articles from Supabase and renders them
 // into the page sections. Replaces placeholder content with
 // live data while keeping the existing design intact.
-// ============================================================
+// ===========================================================
 
 (async function () {
 
