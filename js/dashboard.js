@@ -1,4 +1,4 @@
-// ============================================================
+// ===========================================================
 // js/dashboard.js
 // Admin Dashboard — all logic for auth, article CRUD,
 // image uploads, site settings, and UI state management.
@@ -14,7 +14,7 @@
 //     the admin account in Supabase Auth.
 //   - See the README for how to improve this with a custom
 //     Supabase database role or metadata check instead.
-// ============================================================
+// ===========================================================
 
 // ── Admin check — uses Supabase user_metadata.role ──────────
 // Set role in Supabase Auth dashboard:
