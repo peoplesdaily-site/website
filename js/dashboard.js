@@ -1,0 +1,1391 @@
+// ===========================================================
+// js/dashboard.js
+// Admin Dashboard — all logic for auth, article CRUD,
+// image uploads, site settings, and UI state management.
+//
+// Security note:
+//   - Admin access is verified by checking the signed-in
+//     user's email against the known admin email.
+//   - The email is stored in a JS constant (not exposed in
+//     the HTML). This is a client-side check for UX only.
+//   - The REAL security layer is Supabase Row-Level Security
+//     (RLS). Even if someone bypasses this check, they cannot
+//     write or delete data unless they are authenticated as
+//     the admin account in Supabase Auth.
+//   - See the README for how to improve this with a custom
+//     Supabase database role or metadata check instead.
+// ===========================================================
+
+// ── Admin check — uses Supabase user_metadata.role ──────────
+// Set role in Supabase Auth dashboard:
+//   Auth → Users → click admin user → Edit → User Metadata
+//   Set: { "role": "admin" }
+// This is more secure than checking email in client code.
+// RLS on your tables is still the real security layer.
+// No admin email is exposed anywhere in this file.
+
+// ── Storage bucket name ───────────────────────────────────
+const STORAGE_BUCKET = 'news-images';
+const ADMIN_EMAIL = atob('cGVvcGxlc2RhaWx5bmV3c29ubGluZUBnbWFpbC5jb20=');
+
+// ── Global state ──────────────────────────────────────────
+let allArticles  = [];   // cached article list
+let deleteTarget = null; // id of article pending deletion
+let currentUser  = null; // signed-in Supabase user object
+
+// ══════════════════════════════════════════════════════════
+// INITIALISATION — runs on page load
+// ══════════════════════════════════════════════════════════
+(async function init() {
+
+  // Check if a user is already signed in
+  const { data: { session } } = await _supabase.auth.getSession();
+
+  if (!session) {
+    // Not signed in → redirect to signin page
+    window.location.href = 'signin.html';
+    return;
+  }
+
+  currentUser = session.user;
+
+  // Check if this user is the admin
+  const isAdmin = (currentUser.user_metadata && currentUser.user_metadata.role === 'admin') ||
+                  (currentUser.app_metadata  && currentUser.app_metadata.role  === 'admin') ||
+                  (currentUser.email === ADMIN_EMAIL);
+  if (!isAdmin) {
+    showScreen('denied');
+    return;
+  }
+
+  // All good — show the dashboard
+  document.getElementById('nav-user-email').textContent = currentUser.email;
+  showScreen('dashboard');
+  loadOverview();
+
+})();
+
+// Listen for auth state changes (e.g. sign-out in another tab)
+_supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    window.location.href = 'signin.html';
+    return;
+  }
+
+  if (session?.user) {
+    currentUser = session.user;
+
+    const isAdminUser = (currentUser.user_metadata && currentUser.user_metadata.role === 'admin') ||
+                        (currentUser.app_metadata  && currentUser.app_metadata.role  === 'admin') ||
+                        (currentUser.email === ADMIN_EMAIL);
+    if (!isAdminUser) {
+      showScreen('denied');
+      return;
+    }
+
+    document.getElementById('nav-user-email').textContent = currentUser.email;
+    showScreen('dashboard');
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+// SCREEN MANAGEMENT
+// ══════════════════════════════════════════════════════════
+
+function showScreen(which) {
+  document.getElementById('access-denied').style.display   = which === 'denied'    ? 'flex'  : 'none';
+  document.getElementById('dashboard-shell').style.display = which === 'dashboard' ? 'grid'  : 'none';
+
+  // Clear the inline visibility:hidden on <body> so the CSS class can take effect
+  document.body.style.visibility = 'visible';
+  document.body.classList.add('auth-ready');
+  document.body.classList.remove('auth-pending');
+}
+
+// ══════════════════════════════════════════════════════════
+// VIEW (TAB) SWITCHING
+// ══════════════════════════════════════════════════════════
+
+const viewTitles = {
+  'view-overview':     'Overview',
+  'view-articles':     'All Articles',
+  'view-new':          'New Article',
+  'view-opinions':     'Opinion & Analysis',
+  'view-settings':     'Site Settings',
+  'view-ads':          'Advertisement Banners',
+  'view-pages':        'Edit Pages',
+  'view-subscribers':  'Newsletter Subscribers',
+};
+
+function showView(id) {
+  // Hide all views, activate the chosen one
+  document.querySelectorAll('.dash-view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  // Update nav link active state
+  document.querySelectorAll('.dash-nav-link').forEach(l => l.classList.remove('active'));
+  event && event.target && event.target.closest('.dash-nav-link') &&
+    event.target.closest('.dash-nav-link').classList.add('active');
+
+  // Update top bar title
+  document.getElementById('view-title').textContent = viewTitles[id] || 'Dashboard';
+
+  // Lazy-load data for each view
+  if (id === 'view-overview')     loadOverview();
+  if (id === 'view-articles')     loadArticlesTable();
+  if (id === 'view-opinions')     loadOpinions();
+  if (id === 'view-settings')     loadSettings();
+  if (id === 'view-ads')          loadAds();
+  if (id === 'view-pages')        loadPageEditor();
+  if (id === 'view-subscribers')  loadSubscribers();
+}
+
+
+// ══════════════════════════════════════════════════════════
+// AUTH — SIGN OUT
+// ══════════════════════════════════════════════════════════
+
+async function doSignOut() {
+  await _supabase.auth.signOut();
+  currentUser = null;
+  window.location.href = 'signin.html';
+}
+
+// ══════════════════════════════════════════════════════════
+// OVERVIEW — load stats + recent articles preview
+// ══════════════════════════════════════════════════════════
+
+async function loadOverview() {
+  // Fetch all articles (no status filter — admin sees all)
+  const { data, error } = await _supabase
+    .from('articles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) { toast('Error loading articles: ' + error.message, 'error'); return; }
+
+  allArticles = data || [];
+
+  // Stats
+  document.getElementById('stat-total').textContent    = allArticles.length;
+  document.getElementById('stat-pub').textContent      = allArticles.filter(a => a.status === 'published').length;
+  document.getElementById('stat-draft').textContent    = allArticles.filter(a => a.status === 'draft').length;
+  document.getElementById('stat-featured').textContent = allArticles.filter(a => a.is_featured).length;
+
+  // Recent 10 in table
+  renderTable(allArticles.slice(0, 10), 'overview-table-wrap');
+
+  // Hero order panel — show featured articles sorted by display_order then published_at
+  const featured = allArticles
+    .filter(a => a.is_featured && a.status === 'published')
+    .sort((a, b) => {
+      if (a.display_order && b.display_order) return a.display_order - b.display_order;
+      if (a.display_order) return -1;
+      if (b.display_order) return 1;
+      return new Date(b.published_at) - new Date(a.published_at);
+    });
+  renderHeroOrderPanel(featured);
+}
+
+// ══════════════════════════════════════════════════════════
+// ARTICLES TABLE
+// ══════════════════════════════════════════════════════════
+
+async function loadArticlesTable() {
+  const { data, error } = await _supabase
+    .from('articles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) { toast('Error loading articles: ' + error.message, 'error'); return; }
+  allArticles = data || [];
+
+  // Populate category filter
+  const cats = [...new Set(allArticles.map(a => a.category).filter(Boolean))].sort();
+  const sel  = document.getElementById('filter-category');
+  sel.innerHTML = '<option value="">All categories</option>' +
+    cats.map(c => `<option>${c}</option>`).join('');
+
+  renderTable(allArticles, 'articles-table-wrap');
+}
+
+function filterTable() {
+  const search = document.getElementById('filter-search').value.toLowerCase();
+  const status = document.getElementById('filter-status').value;
+  const cat    = document.getElementById('filter-category').value;
+
+  const filtered = allArticles.filter(a => {
+    const matchSearch = !search || a.title.toLowerCase().includes(search);
+    const matchStatus = !status || a.status === status;
+    const matchCat    = !cat    || a.category === cat;
+    return matchSearch && matchStatus && matchCat;
+  });
+
+  renderTable(filtered, 'articles-table-wrap');
+}
+
+function renderTable(articles, wrapperId) {
+  const wrap = document.getElementById(wrapperId);
+
+  if (!articles || articles.length === 0) {
+    wrap.innerHTML = '<p style="padding:28px;color:var(--text-muted);font-size:13px">No articles found.</p>';
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="table-scroll">
+    <table class="articles-table">
+      <thead>
+        <tr>
+          <th style="width:60px">Image</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Featured</th>
+          <th>Date</th>
+          <th style="width:160px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${articles.map(a => `
+          <tr data-id="${a.id}">
+            <td>
+              ${a.image_url
+                ? `<img src="${a.image_url}" class="article-thumb" onerror="this.style.display='none'">`
+                : `<div class="article-thumb" style="background:var(--border)"></div>`}
+            </td>
+            <td>
+              <div class="article-title-cell">
+                ${a.title}
+                <div class="article-slug">${a.slug}</div>
+              </div>
+            </td>
+            <td>${a.category ? `<span class="badge badge-grey">${a.category}</span>` : '—'}</td>
+            <td>
+              <span class="badge ${a.status === 'published' ? 'badge-green' : 'badge-orange'}">
+                ${a.status}
+              </span>
+            </td>
+            <td>
+              ${a.is_featured
+                ? '<span class="badge badge-star">⭐ Featured</span>'
+                : '<span style="color:var(--text-muted)">—</span>'}
+            </td>
+            <td style="white-space:nowrap;font-size:12px;color:var(--text-muted)">
+              ${a.created_at ? new Date(a.created_at).toLocaleDateString('en-GB') : '—'}
+            </td>
+            <td>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-ghost btn-sm" onclick="editArticle('${a.id}')">Edit</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleFeatured('${a.id}', ${a.is_featured})">
+                  ${a.is_featured ? 'Unfeature' : 'Feature'}
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete('${a.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════
+// ARTICLE FORM — CREATE & EDIT
+// ══════════════════════════════════════════════════════════
+
+/** Auto-generate slug from title */
+function autoSlug() {
+  // Only auto-generate for new articles (no ID)
+  if (document.getElementById('form-id').value) return;
+  const title = document.getElementById('form-title').value;
+  const slug  = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 80);
+  document.getElementById('form-slug').value = slug;
+}
+
+/** Populate form with existing article data for editing */
+function editArticle(id) {
+  const a = allArticles.find(x => x.id === id);
+  if (!a) { toast('Article not found in cache. Reload the page.', 'error'); return; }
+
+  document.getElementById('form-id').value        = a.id;
+  document.getElementById('form-title').value     = a.title || '';
+  document.getElementById('form-slug').value      = a.slug || '';
+  document.getElementById('form-category').value  = a.category || '';
+  document.getElementById('form-author').value    = a.author_name || '';
+  document.getElementById('form-source').value    = a.source_name || '';
+  document.getElementById('form-status').value    = a.status || 'published';
+  document.getElementById('form-excerpt').value   = a.excerpt || '';
+  document.getElementById('form-content').value   = a.content || '';
+  document.getElementById('form-image-url').value = a.image_url || '';
+  document.getElementById('form-featured').checked = !!a.is_featured;
+
+  // Populate the rich editor
+  const editorEl = document.getElementById('rich-editor');
+  if (editorEl) {
+    editorEl.innerHTML = a.content || '';
+  }
+
+  // Show image preview if URL exists
+  if (a.image_url) {
+    document.getElementById('upload-preview').innerHTML =
+      `<img src="${a.image_url}" alt="Current image">`;
+  }
+
+  document.getElementById('form-panel-title').textContent = 'Edit Article';
+  showView('view-new');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/** Reset form back to blank "new article" state */
+function resetForm() {
+  document.getElementById('article-form').reset();
+  document.getElementById('form-id').value = '';
+  document.getElementById('form-slug').value = '';
+  document.getElementById('upload-preview').innerHTML = '';
+  document.getElementById('upload-status').textContent = '';
+  document.getElementById('form-panel-title').textContent = 'Create New Article';
+
+  // Clear rich editor
+  const editorEl = document.getElementById('rich-editor');
+  if (editorEl) editorEl.innerHTML = '';
+}
+
+/** Save article (create or update) */
+async function saveArticle(statusOverride) {
+  // Sync rich editor content to the hidden textarea first
+  const editorEl = document.getElementById('rich-editor');
+  if (editorEl) {
+    document.getElementById('form-content').value = editorEl.innerHTML.trim();
+  }
+
+  const id    = document.getElementById('form-id').value;
+  const title = document.getElementById('form-title').value.trim();
+  const slug  = document.getElementById('form-slug').value.trim();
+
+  if (!title) {
+    toast('Please enter an article title.', 'error');
+    return;
+  }
+  if (!slug) {
+    toast('Could not generate a URL for this article. Please check the title.', 'error');
+    return;
+  }
+
+  // Gather form data
+  const payload = {
+    title,
+    slug,
+    category:    document.getElementById('form-category').value || null,
+    author_name: document.getElementById('form-author').value.trim() || null,
+    source_name: document.getElementById('form-source').value.trim() || null,
+    status:      statusOverride || document.getElementById('form-status').value,
+    excerpt:     document.getElementById('form-excerpt').value.trim() || null,
+    content:     document.getElementById('form-content').value.trim() || null,
+    image_url:   document.getElementById('form-image-url').value.trim() || null,
+    is_featured: document.getElementById('form-featured').checked,
+    updated_at:  new Date().toISOString(),
+  };
+
+  let error;
+
+  if (id) {
+    // UPDATE existing article
+    const res = await _supabase.from('articles').update(payload).eq('id', id);
+    error = res.error;
+  } else {
+    // CREATE new article
+    payload.published_at = payload.status === 'published' ? new Date().toISOString() : null;
+    const res = await _supabase.from('articles').insert([payload]);
+    error = res.error;
+  }
+
+  if (error) {
+    toast('Save failed: ' + error.message, 'error');
+    return;
+  }
+
+  toast(id ? 'Article updated!' : 'Article created!', 'success');
+  resetForm();
+  showView('view-articles');
+  loadArticlesTable();
+}
+
+// ══════════════════════════════════════════════════════════
+// TOGGLE FEATURED
+// ══════════════════════════════════════════════════════════
+
+async function toggleFeatured(id, currentValue) {
+  const { error } = await _supabase
+    .from('articles')
+    .update({ is_featured: !currentValue, updated_at: new Date().toISOString() })
+    .eq('id', id);
+
+  if (error) { toast('Error updating featured: ' + error.message, 'error'); return; }
+
+  toast(!currentValue ? 'Article marked as featured.' : 'Article removed from featured.', 'success');
+  loadArticlesTable();
+}
+
+// ══════════════════════════════════════════════════════════
+// DELETE ARTICLE
+// ══════════════════════════════════════════════════════════
+
+function confirmDelete(id) {
+  deleteTarget = id;
+  document.getElementById('delete-modal').classList.add('open');
+
+  document.getElementById('confirm-delete-btn').onclick = async () => {
+    closeModal();
+    const { error } = await _supabase.from('articles').delete().eq('id', deleteTarget);
+    if (error) { toast('Delete failed: ' + error.message, 'error'); return; }
+    toast('Article deleted.', 'success');
+    deleteTarget = null;
+    loadOverview();
+    loadArticlesTable();
+  };
+}
+
+function closeModal() {
+  document.getElementById('delete-modal').classList.remove('open');
+}
+
+// Close modal on overlay click
+document.getElementById('delete-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ══════════════════════════════════════════════════════════
+// IMAGE UPLOAD TO SUPABASE STORAGE
+// ══════════════════════════════════════════════════════════
+
+async function handleImageUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Validate size (5 MB max)
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Image is too large. Maximum size is 5 MB.', 'error');
+    return;
+  }
+
+  const statusEl  = document.getElementById('upload-status');
+  const previewEl = document.getElementById('upload-preview');
+  statusEl.textContent = 'Uploading…';
+
+  // Create a unique filename using timestamp + original name
+  const ext      = file.name.split('.').pop();
+  const fileName = `articles/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { data, error } = await _supabase
+    .storage
+    .from(STORAGE_BUCKET)
+    .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+  if (error) {
+    statusEl.textContent = 'Upload failed: ' + error.message;
+    toast('Image upload failed: ' + error.message, 'error');
+    return;
+  }
+
+  // Get the public URL
+  const { data: urlData } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
+  const publicUrl = urlData.publicUrl;
+
+  // Fill in the URL field
+  document.getElementById('form-image-url').value = publicUrl;
+  statusEl.textContent = '✓ Image uploaded successfully.';
+
+  // Show preview
+  previewEl.innerHTML = `<img src="${publicUrl}" alt="Uploaded image">`;
+
+  toast('Image uploaded!', 'success');
+}
+
+// Drag-and-drop support for upload zone
+const uploadZone = document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('image-upload-input').files = dt.files;
+    handleImageUpload(document.getElementById('image-upload-input'));
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+// SITE SETTINGS
+// ══════════════════════════════════════════════════════════
+
+async function loadSettings() {
+  const wrap = document.getElementById('settings-form-wrap');
+
+  const { data, error } = await _supabase
+    .from('site_settings')
+    .select('*')
+    .limit(1)
+    .single();
+
+  const s = data || {};
+
+  wrap.innerHTML = `
+    <div style="max-width:600px">
+      <div class="form-row full" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Site Name</label>
+          <input type="text" id="sett-site-name" value="${escHtml(s.site_name || '')}" placeholder="e.g. People's Daily News Online">
+        </div>
+      </div>
+      <div class="form-row full" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Logo URL</label>
+          <input type="url" id="sett-logo-url" value="${escHtml(s.logo_url || '')}" placeholder="https://…">
+        </div>
+      </div>
+      <div class="form-row full" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Hero Title</label>
+          <input type="text" id="sett-hero-title" value="${escHtml(s.hero_title || '')}" placeholder="e.g. Botswana's Most Trusted News Source">
+        </div>
+      </div>
+      <div class="form-row full" style="margin-bottom:24px">
+        <div class="form-group">
+          <label>Hero Subtitle</label>
+          <input type="text" id="sett-hero-subtitle" value="${escHtml(s.hero_subtitle || '')}" placeholder="Short tagline shown below the hero title">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings('${s.id || ''}')">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Settings
+      </button>
+    </div>
+  `;
+}
+
+async function saveSettings(existingId) {
+  const payload = {
+    site_name:     document.getElementById('sett-site-name').value.trim(),
+    logo_url:      document.getElementById('sett-logo-url').value.trim() || null,
+    hero_title:    document.getElementById('sett-hero-title').value.trim() || null,
+    hero_subtitle: document.getElementById('sett-hero-subtitle').value.trim() || null,
+    updated_at:    new Date().toISOString(),
+  };
+
+  let error;
+  if (existingId) {
+    const res = await _supabase.from('site_settings').update(payload).eq('id', existingId);
+    error = res.error;
+  } else {
+    const res = await _supabase.from('site_settings').insert([payload]);
+    error = res.error;
+  }
+
+  if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+  toast('Settings saved!', 'success');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// ADS MANAGER
+// Edit the 4 ad slots on the homepage: image upload, overlay
+// text, and a click-through link. Backed by the "ads" table
+// (one row per slot_key). Run the SQL migration to create it
+// before using this view.
+// ══════════════════════════════════════════════════════════
+
+const AD_SLOTS = [
+  { key: 'top',      label: 'Top Banner (below header, full-width)',            size: '1500×500px recommended' },
+  { key: 'mid',      label: 'Mid-Page Banner (between Politics & Business)',    size: '1500×500px recommended' },
+  { key: 'sidebar1', label: 'Sidebar Ad 1 (right column, first slot)',          size: '300×250px recommended' },
+  { key: 'sidebar2', label: 'Sidebar Ad 2 (right column, second slot)',         size: '300×250px recommended' },
+];
+
+async function loadAds() {
+  const wrap = document.getElementById('ads-form-wrap');
+
+  const { data, error } = await _supabase.from('ads').select('*');
+
+  if (error) {
+    wrap.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Could not load ads. Make sure the "ads" table has been created (see the SQL migration). Error: ' + error.message + '</p>';
+    return;
+  }
+
+  const bySlot = {};
+  (data || []).forEach(a => { bySlot[a.slot_key] = a; });
+
+  wrap.innerHTML = `
+    <p style="font-family:var(--font-ui);font-size:12px;color:var(--text-muted);margin-bottom:20px;line-height:1.6">
+      Upload an image for each slot. Overlay text (optional) appears on top of the ad image, the way
+      article titles appear on the hero image. Add a link and the whole ad becomes clickable — it opens
+      in a new tab, so it can point to your website or a social media post.
+    </p>
+    ${AD_SLOTS.map(slot => {
+      const a = bySlot[slot.key] || {};
+      return `
+        <div style="border:1px solid var(--border);border-radius:var(--radius);margin-bottom:18px;overflow:hidden">
+          <div style="padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <strong style="font-size:12px;color:var(--primary)">${slot.label}</strong>
+            <span style="font-size:11px;color:var(--text-muted)">${slot.size}</span>
+          </div>
+          <div style="padding:16px">
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Ad Image</label>
+              <div class="upload-zone" onclick="document.getElementById('ad-upload-${slot.key}').click()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" style="width:30px;height:30px;margin:0 auto">
+                  <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+                  <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+                </svg>
+                <div class="upload-zone-label"><strong>Click to upload</strong> an ad image<br><span style="font-size:11px">PNG, JPG, WEBP · Max 5MB</span></div>
+                <div class="upload-preview" id="ad-preview-${slot.key}">
+                  ${a.image_url ? `<img src="${escHtml(a.image_url)}" alt="">` : ''}
+                </div>
+              </div>
+              <input type="file" id="ad-upload-${slot.key}" accept="image/*" style="display:none" onchange="handleAdImageUpload(this, '${slot.key}')">
+              <div id="ad-upload-status-${slot.key}" style="font-size:12px;color:var(--text-muted);margin-top:6px"></div>
+              <input type="hidden" id="ad-imgurl-${slot.key}" value="${escHtml(a.image_url || '')}">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Overlay Text (optional)</label>
+                <input type="text" id="ad-text-${slot.key}" value="${escHtml(a.ad_text || '')}" placeholder="e.g. 50% Off This Week Only">
+              </div>
+              <div class="form-group">
+                <label>Click-Through Link</label>
+                <input type="url" id="ad-link-${slot.key}" value="${escHtml(a.link_url || '')}" placeholder="https://… (website or social post)">
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+    <button class="btn btn-primary" onclick="saveAllAds()">
+      <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+      Save Ad Settings
+    </button>
+    <div id="ads-save-msg" style="margin-top:10px;font-size:12px;font-family:var(--font-ui);min-height:16px"></div>
+  `;
+}
+
+async function handleAdImageUpload(input, slotKey) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Image is too large. Maximum size is 5 MB.', 'error');
+    return;
+  }
+
+  const statusEl = document.getElementById('ad-upload-status-' + slotKey);
+  statusEl.textContent = 'Uploading…';
+
+  const ext = file.name.split('.').pop();
+  const fileName = `ads/${slotKey}-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { data, error } = await _supabase
+    .storage
+    .from(STORAGE_BUCKET)
+    .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+  if (error) {
+    statusEl.textContent = 'Upload failed: ' + error.message;
+    toast('Ad image upload failed: ' + error.message, 'error');
+    return;
+  }
+
+  const { data: urlData } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
+  const publicUrl = urlData.publicUrl;
+
+  document.getElementById('ad-imgurl-' + slotKey).value = publicUrl;
+  document.getElementById('ad-preview-' + slotKey).innerHTML = `<img src="${publicUrl}" alt="Uploaded ad image">`;
+  statusEl.textContent = '✓ Image uploaded successfully.';
+  toast('Ad image uploaded!', 'success');
+}
+
+async function saveAllAds() {
+  const msgEl = document.getElementById('ads-save-msg');
+
+  const updates = AD_SLOTS.map(slot => {
+    const payload = {
+      slot_key:   slot.key,
+      image_url:  document.getElementById('ad-imgurl-' + slot.key).value.trim() || null,
+      ad_text:    document.getElementById('ad-text-' + slot.key).value.trim() || null,
+      link_url:   document.getElementById('ad-link-' + slot.key).value.trim() || null,
+      updated_at: new Date().toISOString(),
+    };
+    return _supabase.from('ads').upsert(payload, { onConflict: 'slot_key' });
+  });
+
+  const results = await Promise.all(updates);
+  const failed = results.filter(r => r.error);
+
+  if (failed.length > 0) {
+    msgEl.innerHTML = '<span style="color:var(--accent)">Save failed: ' + failed[0].error.message + '</span>';
+    toast('Save failed: ' + failed[0].error.message, 'error');
+    return;
+  }
+
+  msgEl.innerHTML = '<span style="color:var(--green)">✓ Ad settings saved!</span>';
+  toast('Ad settings saved!', 'success');
+  setTimeout(loadAds, 600);
+}
+
+// ══════════════════════════════════════════════════════════
+// OPINION & ANALYSIS
+// Lets an admin post columnist/opinion pieces with a profile
+// photo, name, role, headline and excerpt — replaces the
+// hardcoded cards that used to be on the homepage.
+// Backed by the "opinions" table (see SQL migration).
+// ══════════════════════════════════════════════════════════
+
+let allOpinions       = [];
+let editingOpinionId  = null;
+
+async function loadOpinions() {
+  const tableWrap = document.getElementById('opinions-table-wrap');
+  if (tableWrap) tableWrap.innerHTML = '<div class="spinner"></div>';
+
+  const { data, error } = await _supabase
+    .from('opinions')
+    .select('*')
+    .order('published_at', { ascending: false });
+
+  if (error) {
+    if (tableWrap) tableWrap.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Could not load opinion posts. Make sure the "opinions" table has been created (see the SQL migration). Error: ' + error.message + '</p>';
+    return;
+  }
+
+  allOpinions = data || [];
+  renderOpinionForm();
+  renderOpinionsTable();
+}
+
+function renderOpinionForm() {
+  const formWrap = document.getElementById('opinion-form-wrap');
+  if (!formWrap) return;
+
+  const o = editingOpinionId ? allOpinions.find(x => x.id === editingOpinionId) : null;
+
+  formWrap.innerHTML = `
+    <input type="hidden" id="op-id" value="${escHtml(o && o.id || '')}">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Contributor Name *</label>
+        <input type="text" id="op-author" value="${escHtml(o && o.author_name || '')}" placeholder="e.g. Kefilwe Mogami">
+      </div>
+      <div class="form-group">
+        <label>Role / Title</label>
+        <input type="text" id="op-role" value="${escHtml(o && o.author_role || '')}" placeholder="e.g. Senior Correspondent">
+      </div>
+    </div>
+
+    <div class="form-row full" style="margin-bottom:16px">
+      <div class="form-group">
+        <label>Profile Photo</label>
+        <div class="upload-zone" onclick="document.getElementById('op-avatar-upload').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" style="width:30px;height:30px;margin:0 auto">
+            <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+            <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+          </svg>
+          <div class="upload-zone-label"><strong>Click to upload</strong> a profile photo<br><span style="font-size:11px">PNG, JPG, WEBP · Max 5MB</span></div>
+          <div class="upload-preview" id="op-avatar-preview">
+            ${o && o.avatar_url ? `<img src="${escHtml(o.avatar_url)}" style="border-radius:50%;max-height:80px">` : ''}
+          </div>
+        </div>
+        <input type="file" id="op-avatar-upload" accept="image/*" style="display:none" onchange="handleOpinionAvatarUpload(this)">
+        <div id="op-avatar-status" style="font-size:12px;color:var(--text-muted);margin-top:6px"></div>
+        <input type="hidden" id="op-avatar-url" value="${escHtml(o && o.avatar_url || '')}">
+      </div>
+    </div>
+
+    <div class="form-row full" style="margin-bottom:16px">
+      <div class="form-group">
+        <label>Headline / Opinion Title *</label>
+        <input type="text" id="op-headline" value="${escHtml(o && o.headline || '')}" placeholder='e.g. "The Anti-Corruption Bill Is a Milestone"'>
+      </div>
+    </div>
+
+    <div class="form-row full" style="margin-bottom:16px">
+      <div class="form-group">
+        <label>Excerpt (shown on the homepage card)</label>
+        <textarea id="op-excerpt" rows="3" placeholder="One or two sentences summarising the opinion piece…">${escHtml(o && o.excerpt || '')}</textarea>
+      </div>
+    </div>
+
+    <div class="form-row full" style="margin-bottom:16px">
+      <div class="form-group">
+        <label>Full Piece (optional)</label>
+        <textarea id="op-content" rows="6" placeholder="Full opinion piece text, if you want to publish it in full…">${escHtml(o && o.content || '')}</textarea>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-bottom:20px">
+      <div class="form-group">
+        <label>Status</label>
+        <select id="op-status">
+          <option value="published" ${(!o || o.status === 'published') ? 'selected' : ''}>Published</option>
+          <option value="draft" ${o && o.status === 'draft' ? 'selected' : ''}>Draft</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="saveOpinion()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        ${editingOpinionId ? 'Update Opinion Post' : 'Publish Opinion Post'}
+      </button>
+      ${editingOpinionId ? `<button class="btn btn-ghost" onclick="cancelEditOpinion()">Cancel Edit</button>` : ''}
+    </div>
+  `;
+}
+
+async function handleOpinionAvatarUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Image is too large. Maximum size is 5 MB.', 'error');
+    return;
+  }
+
+  const statusEl = document.getElementById('op-avatar-status');
+  statusEl.textContent = 'Uploading…';
+
+  const ext = file.name.split('.').pop();
+  const fileName = `opinions/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { data, error } = await _supabase
+    .storage
+    .from(STORAGE_BUCKET)
+    .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+  if (error) {
+    statusEl.textContent = 'Upload failed: ' + error.message;
+    toast('Photo upload failed: ' + error.message, 'error');
+    return;
+  }
+
+  const { data: urlData } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
+  const publicUrl = urlData.publicUrl;
+
+  document.getElementById('op-avatar-url').value = publicUrl;
+  document.getElementById('op-avatar-preview').innerHTML = `<img src="${publicUrl}" style="border-radius:50%;max-height:80px">`;
+  statusEl.textContent = '✓ Photo uploaded successfully.';
+  toast('Profile photo uploaded!', 'success');
+}
+
+async function saveOpinion() {
+  const id        = document.getElementById('op-id').value;
+  const author    = document.getElementById('op-author').value.trim();
+  const headline  = document.getElementById('op-headline').value.trim();
+
+  if (!author) { toast('Please enter the contributor name.', 'error'); return; }
+  if (!headline) { toast('Please enter a headline.', 'error'); return; }
+
+  const payload = {
+    author_name: author,
+    author_role: document.getElementById('op-role').value.trim() || null,
+    avatar_url:  document.getElementById('op-avatar-url').value.trim() || null,
+    headline,
+    excerpt:     document.getElementById('op-excerpt').value.trim() || null,
+    content:     document.getElementById('op-content').value.trim() || null,
+    status:      document.getElementById('op-status').value,
+  };
+
+  let error;
+  if (id) {
+    const res = await _supabase.from('opinions').update(payload).eq('id', id);
+    error = res.error;
+  } else {
+    payload.published_at = new Date().toISOString();
+    const res = await _supabase.from('opinions').insert([payload]);
+    error = res.error;
+  }
+
+  if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+
+  toast(id ? 'Opinion post updated!' : 'Opinion post published!', 'success');
+  editingOpinionId = null;
+  loadOpinions();
+}
+
+function editOpinion(id) {
+  editingOpinionId = id;
+  renderOpinionForm();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelEditOpinion() {
+  editingOpinionId = null;
+  renderOpinionForm();
+}
+
+async function deleteOpinion(id) {
+  if (!confirm('Delete this opinion post? This cannot be undone.')) return;
+  const { error } = await _supabase.from('opinions').delete().eq('id', id);
+  if (error) { toast('Delete failed: ' + error.message, 'error'); return; }
+  toast('Opinion post deleted.', 'success');
+  if (editingOpinionId === id) editingOpinionId = null;
+  loadOpinions();
+}
+
+function renderOpinionsTable() {
+  const wrap = document.getElementById('opinions-table-wrap');
+  if (!wrap) return;
+
+  if (allOpinions.length === 0) {
+    wrap.innerHTML = '<p style="padding:20px;color:var(--text-muted);font-size:13px">No opinion posts yet. Use the form above to publish the first one.</p>';
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="table-scroll">
+    <table class="articles-table">
+      <thead>
+        <tr>
+          <th style="width:56px">Photo</th>
+          <th>Contributor</th>
+          <th>Headline</th>
+          <th>Status</th>
+          <th style="width:150px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${allOpinions.map(o => `
+          <tr>
+            <td>
+              ${o.avatar_url
+                ? `<img src="${o.avatar_url}" class="article-thumb" style="border-radius:50%;width:40px;height:40px;object-fit:cover" onerror="this.style.display='none'">`
+                : `<div class="article-thumb" style="border-radius:50%;width:40px;height:40px;background:var(--border)"></div>`}
+            </td>
+            <td>
+              <div class="article-title-cell">
+                ${escHtml(o.author_name)}
+                <div class="article-slug">${escHtml(o.author_role || '')}</div>
+              </div>
+            </td>
+            <td style="max-width:320px">${escHtml(o.headline)}</td>
+            <td><span class="badge ${o.status === 'published' ? 'badge-green' : 'badge-orange'}">${o.status}</span></td>
+            <td>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-ghost btn-sm" onclick="editOpinion('${o.id}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteOpinion('${o.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════
+// TOAST NOTIFICATIONS
+// ══════════════════════════════════════════════════════════
+
+let toastTimer;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + (type || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3500);
+}
+
+// ══════════════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════════════
+
+/** Escape HTML special characters to avoid injection in innerHTML */
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ══════════════════════════════════════════════════════════
+// RICH TEXT EDITOR
+// ══════════════════════════════════════════════════════════
+
+function rfmt(cmd) {
+  const editor = document.getElementById('rich-editor');
+  editor.focus();
+
+  if (cmd === 'bold')       document.execCommand('bold', false, null);
+  else if (cmd === 'italic')    document.execCommand('italic', false, null);
+  else if (cmd === 'underline') document.execCommand('underline', false, null);
+  else if (cmd === 'heading')   document.execCommand('formatBlock', false, 'h2');
+  else if (cmd === 'subheading') document.execCommand('formatBlock', false, 'h3');
+  else if (cmd === 'para')      document.execCommand('formatBlock', false, 'p');
+  else if (cmd === 'ul')        document.execCommand('insertUnorderedList', false, null);
+  else if (cmd === 'ol')        document.execCommand('insertOrderedList', false, null);
+  else if (cmd === 'quote')     document.execCommand('formatBlock', false, 'blockquote');
+  else if (cmd === 'link') {
+    const url = prompt('Enter the link URL:');
+    if (url) document.execCommand('createLink', false, url);
+  }
+  else if (cmd === 'clear')     document.execCommand('removeFormat', false, null);
+}
+
+// ══════════════════════════════════════════════════════════
+// HERO ARTICLE ORDERING
+// ══════════════════════════════════════════════════════════
+
+let heroOrderIds = []; // current drag order of featured article IDs
+
+function renderHeroOrderPanel(featuredArticles) {
+  const wrap = document.getElementById('hero-order-wrap');
+  if (!wrap) return;
+
+  if (!featuredArticles || featuredArticles.length === 0) {
+    wrap.innerHTML = `
+      <div class="dash-panel-body" style="color:var(--text-muted);font-size:13px">
+        No featured articles yet. Mark articles as "Featured" to control their homepage order.
+      </div>`;
+    return;
+  }
+
+  heroOrderIds = featuredArticles.map(a => a.id);
+
+  wrap.innerHTML = `
+    <div class="hero-order-list" id="hero-order-list">
+      ${featuredArticles.map((a, i) => `
+        <div class="hero-order-item" draggable="true" data-id="${a.id}">
+          <span class="hero-drag-handle">⠿</span>
+          <span class="hero-order-rank" style="font-size:11px;font-weight:700;color:var(--text-muted);min-width:18px">#${i+1}</span>
+          ${a.image_url
+            ? `<img src="${a.image_url}" class="hero-order-thumb" onerror="this.style.display='none'">`
+            : `<div class="hero-order-thumb" style="background:var(--border)"></div>`}
+          <div class="hero-order-info">
+            <div class="hero-order-title">${escHtml(a.title)}</div>
+            <div class="hero-order-meta">${a.category || 'Uncategorised'} · ${a.published_at ? new Date(a.published_at).toLocaleDateString('en-GB') : 'No date'}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="hero-save-bar">
+      <span class="hero-save-info">Drag articles up or down to change the order they appear on the homepage hero section.</span>
+      <button class="btn btn-primary btn-sm" onclick="saveHeroOrder()">Save Order</button>
+    </div>
+  `;
+
+  // Wire up drag-and-drop
+  initHeroDragDrop();
+}
+
+function initHeroDragDrop() {
+  const list = document.getElementById('hero-order-list');
+  if (!list) return;
+
+  let dragSrc = null;
+
+  list.querySelectorAll('.hero-order-item').forEach(item => {
+    item.addEventListener('dragstart', function(e) {
+      dragSrc = this;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => this.style.opacity = '0.4', 0);
+    });
+    item.addEventListener('dragend', function() {
+      this.style.opacity = '';
+      list.querySelectorAll('.hero-order-item').forEach(i => i.classList.remove('drag-over'));
+      // Rebuild heroOrderIds from current DOM order
+      heroOrderIds = [...list.querySelectorAll('.hero-order-item')].map(el => el.dataset.id);
+      // Update rank numbers
+      list.querySelectorAll('.hero-order-rank').forEach((el, i) => el.textContent = '#' + (i+1));
+    });
+    item.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (this !== dragSrc) {
+        list.querySelectorAll('.hero-order-item').forEach(i => i.classList.remove('drag-over'));
+        this.classList.add('drag-over');
+      }
+    });
+    item.addEventListener('drop', function(e) {
+      e.preventDefault();
+      if (this !== dragSrc) {
+        const items = [...list.querySelectorAll('.hero-order-item')];
+        const srcIdx = items.indexOf(dragSrc);
+        const tgtIdx = items.indexOf(this);
+        if (srcIdx < tgtIdx) {
+          list.insertBefore(dragSrc, this.nextSibling);
+        } else {
+          list.insertBefore(dragSrc, this);
+        }
+      }
+    });
+  });
+}
+
+async function saveHeroOrder() {
+  // Save display_order to each featured article in Supabase.
+  // Requires a display_order INTEGER column in your articles table.
+  // Run this SQL in Supabase once:
+  //   ALTER TABLE articles ADD COLUMN IF NOT EXISTS display_order integer DEFAULT 0;
+  if (heroOrderIds.length === 0) { toast('Nothing to save.', 'error'); return; }
+
+  const updates = heroOrderIds.map((id, idx) =>
+    _supabase.from('articles').update({ display_order: idx + 1 }).eq('id', id)
+  );
+
+  const results = await Promise.all(updates);
+  const failed = results.filter(r => r.error);
+
+  if (failed.length > 0) {
+    // Likely the display_order column doesn't exist yet
+    toast('Could not save order. Please add the display_order column to your articles table in Supabase. See comments in dashboard.js for the SQL.', 'error');
+    return;
+  }
+
+  toast('Hero order saved! Homepage will reflect the new order.', 'success');
+  // Refresh cached articles
+  allArticles = allArticles.map(a => {
+    const newOrder = heroOrderIds.indexOf(a.id);
+    if (newOrder !== -1) return { ...a, display_order: newOrder + 1 };
+    return a;
+  });
+}
+
+
+// ══════════════════════════════════════════════════════════
+// PAGES EDITOR
+// Edit About Us, Editorial Policy, Contact Us from dashboard
+// ══════════════════════════════════════════════════════════
+
+let currentPageSlug = 'about'; // which page is currently loaded
+
+/** Switch between page tabs (About / Editorial Policy / Contact) */
+function switchPageTab(slug, btn) {
+  document.querySelectorAll('.page-tab').forEach(function(b) {
+    b.className = b === btn
+      ? 'btn btn-primary btn-sm page-tab active'
+      : 'btn btn-ghost btn-sm page-tab';
+  });
+  currentPageSlug = slug;
+  loadPageEditor();
+}
+
+/** Load the chosen page from Supabase and show the edit form */
+async function loadPageEditor() {
+  const wrap = document.getElementById('page-editor-wrap');
+  wrap.innerHTML = '<div class="spinner"></div>';
+
+  const { data: page, error } = await _supabase
+    .from('pages')
+    .select('*')
+    .eq('slug', currentPageSlug)
+    .single();
+
+  // PGRST116 = no rows found — that's OK, it just hasn't been saved yet
+  if (error && error.code !== 'PGRST116') {
+    wrap.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Error loading page: ' + error.message + '</p>';
+    return;
+  }
+
+  const p = page || {};
+  const previewHref = currentPageSlug === 'about'
+    ? 'about.html'
+    : currentPageSlug === 'contact'
+      ? 'contact.html'
+      : currentPageSlug === 'privacy-policy'
+        ? 'privacy-policy.html'
+        : currentPageSlug === 'terms-of-use'
+          ? 'terms-of-use.html'
+          : 'editorial-policy.html';
+
+  // Tab bar — renders all editable pages so no dashboard HTML change is needed
+  const pageTabs = [
+    { slug: 'about',            label: 'About Us' },
+    { slug: 'editorial-policy', label: 'Editorial Policy' },
+    { slug: 'contact',          label: 'Contact Us' },
+    { slug: 'privacy-policy',   label: 'Privacy Policy' },
+    { slug: 'terms-of-use',     label: 'Terms of Use' },
+  ];
+  const tabBarHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">'
+    + pageTabs.map(function(t) {
+        return '<button class="btn btn-sm page-tab ' + (t.slug === currentPageSlug ? 'btn-primary active' : 'btn-ghost') + '" onclick="switchPageTab(\'' + t.slug + '\', this)">' + t.label + '</button>';
+      }).join('')
+    + '</div>';
+
+  wrap.innerHTML = tabBarHTML + `
+    <input type="hidden" id="page-id" value="${escHtml(p.id || '')}">
+
+    <div class="form-row full" style="margin-bottom:14px">
+      <div class="form-group">
+        <label>Page Title</label>
+        <input type="text" id="page-title-input"
+               value="${escHtml(p.title || '')}"
+               placeholder="e.g. About Us">
+        <span class="form-hint">Shown as the main heading on the page.</span>
+      </div>
+    </div>
+
+    <div class="form-row full" style="margin-bottom:20px">
+      <div class="form-group">
+        <label>Page Content</label>
+        <textarea id="page-content-input"
+                  style="min-height:380px;resize:vertical;font-size:13px;line-height:1.75"
+                  placeholder="Write content here.
+
+Separate paragraphs with a blank line.
+
+Short ALL-CAPS lines become section headings — for example:
+
+OUR MISSION
+Write your mission statement here.
+
+CONTACT US
+Reach us at news@pdno.co.bw">${escHtml(p.content || '')}</textarea>
+        <span class="form-hint">
+          ✏️ <strong>Tip:</strong> Use blank lines between paragraphs.
+          Short ALL-CAPS lines (like OUR MISSION) automatically become bold headings on the page.
+        </span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-primary" onclick="savePage()">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Save Page
+      </button>
+      <a href="${previewHref}" target="_blank" class="btn btn-ghost">
+        Preview Page →
+      </a>
+    </div>
+    <div id="page-save-msg" style="margin-top:10px;font-size:12px;font-family:var(--font-ui);min-height:16px"></div>
+  `;
+}
+
+/** Save the edited page content to Supabase */
+async function savePage() {
+  const existingId = document.getElementById('page-id').value;
+  const title   = document.getElementById('page-title-input').value.trim();
+  const content = document.getElementById('page-content-input').value.trim();
+  const msgEl   = document.getElementById('page-save-msg');
+
+  if (!title) {
+    msgEl.innerHTML = '<span style="color:var(--accent)">Page title is required.</span>';
+    return;
+  }
+
+  const payload = {
+    slug:       currentPageSlug,
+    title,
+    content,
+    updated_at: new Date().toISOString(),
+  };
+
+  let error;
+  if (existingId) {
+    const res = await _supabase.from('pages').update(payload).eq('id', existingId);
+    error = res.error;
+  } else {
+    const res = await _supabase.from('pages').insert([payload]);
+    error = res.error;
+  }
+
+  if (error) {
+    msgEl.innerHTML = '<span style="color:var(--accent)">Save failed: ' + error.message + '</span>';
+    toast('Save failed: ' + error.message, 'error');
+    return;
+  }
+
+  msgEl.innerHTML = '<span style="color:var(--green)">✓ Page saved! Changes are live on the website.</span>';
+  toast('Page saved!', 'success');
+  // Reload to populate the hidden ID if it was a fresh insert
+  setTimeout(loadPageEditor, 600);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// NEWSLETTER SUBSCRIBERS
+// View and remove newsletter signups
+// ══════════════════════════════════════════════════════════
+
+async function loadSubscribers() {
+  const wrap    = document.getElementById('subscribers-wrap');
+  const countEl = document.getElementById('subscriber-count');
+  wrap.innerHTML = '<div class="spinner"></div>';
+
+  const { data, error } = await _supabase
+    .from('newsletter_subscribers')
+    .select('*')
+    .order('subscribed_at', { ascending: false });
+
+  if (error) {
+    wrap.innerHTML = '<p style="padding:20px;color:var(--text-muted)">Error: ' + error.message + '</p>';
+    return;
+  }
+
+  const subs = data || [];
+  if (countEl) countEl.textContent = subs.length + ' subscriber' + (subs.length !== 1 ? 's' : '');
+
+  if (subs.length === 0) {
+    wrap.innerHTML = '<p style="padding:28px;color:var(--text-muted);font-size:13px;font-family:var(--font-ui)">No subscribers yet. They appear here once readers sign up via the newsletter box on the homepage.</p>';
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="table-scroll">
+    <table class="articles-table">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Email Address</th>
+          <th style="width:160px">Subscribed</th>
+          <th style="width:90px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${subs.map(function(s, i) { return `
+          <tr>
+            <td style="color:var(--text-muted);font-size:12px;font-family:var(--font-ui)">${i + 1}</td>
+            <td style="font-family:var(--font-ui);font-size:13px;font-weight:500">${escHtml(s.email)}</td>
+            <td style="font-family:var(--font-ui);font-size:12px;color:var(--text-muted);white-space:nowrap">
+              ${s.subscribed_at
+                ? new Date(s.subscribed_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+                : '—'}
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm"
+                      onclick="deleteSubscriber('${s.id}', '${escHtml(s.email)}')">
+                Remove
+              </button>
+            </td>
+          </tr>
+        `; }).join('')}
+      </tbody>
+    </table>
+    </div>
+    <div style="padding:12px 16px;background:var(--bg-soft);border-top:1px solid var(--border);
+                font-family:var(--font-ui);font-size:11px;color:var(--text-muted)">
+      ${subs.length} total subscriber${subs.length !== 1 ? 's' : ''}.
+      You can copy these emails into Mailchimp, Brevo, or any mailing tool.
+    </div>
+  `;
+}
+
+async function deleteSubscriber(id, email) {
+  if (!confirm('Remove ' + email + ' from the subscriber list?')) return;
+  const { error } = await _supabase.from('newsletter_subscribers').delete().eq('id', id);
+  if (error) { toast('Could not remove: ' + error.message, 'error'); return; }
+  toast('Subscriber removed.', 'success');
+  loadSubscribers();
+}
