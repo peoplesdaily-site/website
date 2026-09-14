@@ -638,7 +638,10 @@ async function loadAds() {
         <div style="border:1px solid var(--border);border-radius:var(--radius);margin-bottom:18px;overflow:hidden">
           <div style="padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
             <strong style="font-size:12px;color:var(--primary)">${slot.label}</strong>
-            <span style="font-size:11px;color:var(--text-muted)">${slot.size}</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:11px;color:var(--text-muted)">${slot.size}</span>
+              ${a.image_url ? `<button class="btn btn-danger btn-sm" type="button" onclick="deleteAd('${slot.key}')">Remove Ad</button>` : ''}
+            </div>
           </div>
           <div style="padding:16px">
             <div class="form-group" style="margin-bottom:14px">
@@ -740,6 +743,23 @@ async function saveAllAds() {
   msgEl.innerHTML = '<span style="color:var(--green)">✓ Ad settings saved!</span>';
   toast('Ad settings saved!', 'success');
   setTimeout(loadAds, 600);
+}
+
+async function deleteAd(slotKey) {
+  if (!confirm('Remove this ad? The slot will go back to showing the default placeholder.')) return;
+
+  const { error } = await _supabase
+    .from('ads')
+    .update({ image_url: null, ad_text: null, link_url: null, updated_at: new Date().toISOString() })
+    .eq('slot_key', slotKey);
+
+  if (error) {
+    toast('Could not remove ad: ' + error.message, 'error');
+    return;
+  }
+
+  toast('Ad removed.', 'success');
+  loadAds();
 }
 
 // ══════════════════════════════════════════════════════════
